@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter.messagebox import showinfo
 
-from gui.Table import Table
+from Project.gui.Table import Table
 
 FONT = ("Arial", 20)
 LABEL_FONT = ("Arial", 15)
