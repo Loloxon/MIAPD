@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 import numpy as np
 
 # Kolejność robienia rzeczy
@@ -49,21 +49,28 @@ class DataBase:
         if isinstance(expert, str):
             expert = self._experts_map[expert]
         # for weight of categories use name 'categories'
-        return self._matrices[name][expert]
+        return deepcopy(self._matrices[name][expert])
 
-    def set_matrix(self, name: str, expert: Union[int, str], matrix: np.array) -> None:
+    def set_matrix_field(self, name: str, expert: Union[int, str], i: int, j: int, value: float) -> None:
         if isinstance(expert, str):
             expert = self._experts_map[expert]
-        # for weight of categories use name 'categories'
-        self._matrices[name][expert] = matrix
+        self._matrices[name][expert][i][j] = value
 
-    def is_missing_data(self) -> bool:
-        # possibility to add returning what is missing
+# not used anymore
+    # def set_matrix(self, name: str, expert: Union[int, str], matrix: np.array) -> None:
+    #     if isinstance(expert, str):
+    #         expert = self._experts_map[expert]
+    #     # for weight of categories use name 'categories'
+    #     self._matrices[name][expert] = matrix
+
+    def is_missing_data(self) -> List[Tuple[str, int]]:
+        # return list of tuples with matrix name and expert index
+        missing_matrices = []
         for k, v in self._matrices.items():
-            for matrix in v:
+            for i, matrix in enumerate(v):
                 if (matrix <= 0).any():
-                    return True
-        return False
+                    missing_matrices.append((k, i))
+        return missing_matrices
 
     @property
     def matrices(self) -> Dict[str, List[np.array]]:
