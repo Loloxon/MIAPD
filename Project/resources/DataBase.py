@@ -70,6 +70,10 @@ class DataBase:
         return deepcopy(self._matrices)
 
     @property
+    def experts_map(self) -> Dict[str, List[str]]:
+        return deepcopy(self._experts_map)
+
+    @property
     def subcategories_map(self) -> Dict[str, List[str]]:
         return deepcopy(self._subcategories_map)
 
