@@ -1,14 +1,24 @@
 from tkinter import *
 
+FONT = ('Arial', 16, 'bold')
+
 
 class Table:
 
-    def __init__(self, root, lst):
-
-        for i in range(len(lst)):
-            for j in range(len(lst[0])):
-                self.e = Entry(root, fg='blue', font=('Arial', 16, 'bold'), width=10)
-                self.e.grid(row=i, column=j)
-                self.e.insert("end", round(lst[i][j],3 ))
+    def __init__(self, root, values, names):
+        for i in range(len(names)):
+            self.e = Entry(root, fg='blue', font=FONT, width=10)
+            self.e.grid(row=i + 1, column=0)
+            self.e.insert("end", names[i])
+            self.e.config(state=DISABLED)
+            self.e = Entry(root, fg='blue', font=FONT, width=10)
+            self.e.grid(row=0, column=i + 1)
+            self.e.insert("end", names[i])
+            self.e.config(state=DISABLED)
+        for i in range(len(values)):
+            for j in range(len(values[0])):
+                self.e = Entry(root, fg='blue', font=FONT, width=10)
+                self.e.grid(row=i + 1, column=j + 1)
+                self.e.insert("end", round(values[i][j], 3))
                 if i == 0 or j <= i:
                     self.e.config(state=DISABLED)
