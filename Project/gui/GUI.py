@@ -3,11 +3,13 @@ from tkinter.messagebox import showinfo
 
 import numpy as np
 
+from Project.backend.AHP import AHP
 from Project.gui.Table import Table
 from Project.resources.DataBase import DataBase
 
 FONT = ("Arial", 20)
 LABEL_FONT = ("Arial", 15)
+NO_SUBCATEGORY = "<no subcategory>"
 
 root = Tk()
 root.title("Comparing App")
@@ -55,9 +57,11 @@ def init(db):
     db.set_matrix('categories', 'expert1', np.array([[1, 7/5, 5, 9/5, 8], [5/7, 1, 9/5, 7/5, 5/4], [1/5, 5/9, 1, 3/7, 3/4], [5/9, 5/7, 7/3, 1, 7/9], [1/8, 4/5, 4/3, 9/7, 1]]))
 init(db)
 
+# print(db.matrices)
+# ahp = AHP(db)
+# rank = ahp.calculate_ranking()
+# print(rank)
 
-# TODO
-missing_data = True
 #####################################           COUNTRY           #####################################
 
 column_no = 0
@@ -160,7 +164,7 @@ def preview():
 
     subcategories = list(db.subcategories_map.values())
     for sc in subcategories:
-        sc.insert(0, "<no subcategory>")
+        sc.insert(0, NO_SUBCATEGORY)
 
     subcategories_listbox = Listbox(frame, listvariable=Variable(value=subcategories[0]), height=len(subcategories[0]))
     subcategories_listbox.grid(row=0, column=2, padx=10, pady=10)
@@ -173,12 +177,12 @@ def preview():
     selected_subcategories.grid(row=4, column=0, columnspan=3, padx=10, pady=1)
 
     expert_chosen = ""
-    categories_chosen = ""
+    category_chosen = ""
     subcategories_chosen = ""
     chosen_options = False
 
     def show_selected(event):
-        nonlocal expert_chosen, categories_chosen, subcategories_chosen, chosen_options
+        nonlocal expert_chosen, category_chosen, subcategories_chosen, chosen_options
 
         selected_indices = experts_listbox.curselection()
         if len(selected_indices) > 0:
@@ -186,11 +190,11 @@ def preview():
 
         selected_indices = categories_listbox.curselection()
         if len(selected_indices) > 0:
-            categories_chosen = categories_listbox.get(selected_indices[0])
+            category_chosen = categories_listbox.get(selected_indices[0])
 
             subcategories_listbox.delete(0, "end")
             if subcategories[selected_indices[0]] == "":
-                subcategories_listbox.insert("end", categories_chosen)
+                subcategories_listbox.insert("end", category_chosen)
             else:
                 for sub in subcategories[selected_indices[0]]:
                     subcategories_listbox.insert("end", sub)
@@ -199,11 +203,11 @@ def preview():
         if len(selected_indices) > 0:
             subcategories_chosen = subcategories_listbox.get(selected_indices[0])
 
-        if expert_chosen != "" and categories_chosen != "" and subcategories_chosen != "":
+        if expert_chosen != "" and category_chosen != "" and subcategories_chosen != "":
             chosen_options = True
 
         selected_experts.config(text=expert_chosen)
-        selected_categories.config(text=categories_chosen)
+        selected_categories.config(text=category_chosen)
         selected_subcategories.config(text=subcategories_chosen)
 
     experts_listbox.bind('<<ListboxSelect>>', show_selected)
@@ -214,24 +218,20 @@ def preview():
         if not chosen_options:
             showinfo(title='Missing data', message="First you need to choice all the options from lists!")
         else:
-            nonlocal subcategories_chosen
-            weight_name_entry = Entry(preview_frame, fg='blue', font=('Arial', 16, 'bold'), width=10)
-            weight_name_entry.grid(row=0, column=0)
-            weight_name_entry.insert("end", "Weight of the " + str(subcategories_chosen) + ": ")
-            weight_name_entry.config(state=DISABLED)
-            weight_entry = Entry(preview_frame, fg='blue', font=('Arial', 16, 'bold'), width=10)
-            weight_entry.grid(row=0, column=1)
-            weight_name_entry.insert("end", "5")
+            nonlocal expert_chosen, category_chosen, subcategories_chosen
+            # weight_name_entry = Entry(preview_frame, fg='blue', font=('Arial', 16, 'bold'), width=10)
+            # weight_name_entry.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
+            # weight_name_entry.insert("end", "Weight of the " + str(subcategories_chosen) + ": ")
+            # weight_name_entry.config(state=DISABLED)
+            # weight_entry = Entry(preview_frame, fg='blue', font=('Arial', 16, 'bold'), width=10)
+            # weight_entry.grid(row=0, column=1, columnspan=3, padx=10, pady=10)
+            # weight_name_entry.insert("end", "5")
 
-            countries = ("Poland", "Spain", "USA", "Germany", "Russia")
-            matrix = [[""]]
-            for c in countries:
-                matrix[0].append(c)
-            for c in countries:
-                tmp = [c]
-                for _ in countries:
-                    tmp.append(0)
-                matrix.append(tmp)
+            countries = list(db.countries_map.keys())
+            key = subcategories_chosen
+            if subcategories_chosen == NO_SUBCATEGORY:
+                key = category_chosen
+            matrix = db.get_matrix(key, expert_chosen)
             Table(preview_frame, matrix)
 
             def save():
@@ -260,8 +260,7 @@ preview_button.grid(row=row_no, columnspan=5, pady=10, padx=10)
 
 
 def solve():
-    global missing_data
-    if missing_data:
+    if db.is_missing_data():
         showinfo(title='Missing data', message="First you need fill all the necessary opinions!\n"
                                                "You can do it in \"Show experts' opinions\" section.")
     else:
@@ -270,7 +269,7 @@ def solve():
 
         results = Toplevel()
         results.title("Ranking")
-        results.geometry("400x800")
+        results.geometry("800x800")
         # "1024x576"
         results.resizable(False, False)
 
@@ -281,16 +280,19 @@ def solve():
 
         labels = []
 
-        # TODO tutaj zaciągnąć z DB
-        fake_ranking = [("first", 0.6), ("second", 0.2), ("third", 0.15), ("fourth", 0.05), ("second", 0.2),
-                        ("third", 0.15), ("fourth", 0.05), ("second", 0.2), ("third", 0.15), ("fourth", 0.05)]
-        top = fake_ranking[0][1]
-        bottom = fake_ranking[-1][1]
+        ahp = AHP(db)
+        rank = ahp.calculate_ranking()
+
+        ranking = []
+        for i in range(len(rank[0])):
+            ranking.append((rank[0][i], rank[1][i]))
+
+        # TODO ewentualnie jakieś bajery do wyświetlania
+        top = ranking[0][1]
         multi = 100 / top
-        for country in fake_ranking:
+        for country in ranking:
             label_tmp = Label(frame, text=country[0], font=("Arial", round(country[1] * multi)))
             label_tmp.grid(sticky=S)
-            # label_tmp.config(anchor=CENTER)
             labels.append(label_tmp)
 
 

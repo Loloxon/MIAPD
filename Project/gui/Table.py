@@ -9,6 +9,6 @@ class Table:
             for j in range(len(lst[0])):
                 self.e = Entry(root, fg='blue', font=('Arial', 16, 'bold'), width=10)
                 self.e.grid(row=i, column=j)
-                self.e.insert("end", lst[i][j])
+                self.e.insert("end", round(lst[i][j],3 ))
                 if i == 0 or j <= i:
                     self.e.config(state=DISABLED)
