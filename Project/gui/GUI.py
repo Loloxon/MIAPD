@@ -4,6 +4,7 @@ from tkinter.messagebox import showinfo
 import numpy as np
 
 from Project.backend.AHP import AHP
+from Project.gui.Compare import Compare
 from Project.gui.Table import Table
 from Project.resources.DataBase import DataBase
 
@@ -169,7 +170,7 @@ def preview():
     root.withdraw()
     preview_window = Toplevel()
     preview_window.title("Opinions")
-    preview_window.geometry("1280x720")
+    preview_window.geometry("1600x900")
     # "1024x576"
     preview_window.resizable(False, False)
 
@@ -255,7 +256,6 @@ def preview():
             for widget in preview_frame.winfo_children():
                 widget.destroy()
 
-            countries = list(db.countries_map.keys())
             key = subcategories_chosen
             labels = list(db.countries_map.keys())
             if subcategories_chosen == NO_SUBCATEGORY:
@@ -267,13 +267,53 @@ def preview():
 
             def save():
                 # TODO zapisywanie zmian
+                for widget in preview_frame.winfo_children():
+                    widget.destroy()
                 pass
 
             save_button = Button(preview_frame, text="Save", font=FONT, command=save)
-            save_button.grid(row=len(countries) + 1, columnspan=len(countries) + 1, pady=10, padx=10)
+            save_button.grid(row=len(labels) + 1, columnspan=len(labels) + 1, pady=10, padx=10)
+
+    def edit_expert():
+        if not chosen_options:
+            showinfo(title='Missing data', message="First you need to choice all the options from lists!")
+        else:
+            nonlocal expert_chosen, category_chosen, subcategories_chosen
+
+            for widget in preview_frame.winfo_children():
+                widget.destroy()
+
+            key = subcategories_chosen
+            labels = list(db.countries_map.keys())
+            if subcategories_chosen == NO_SUBCATEGORY:
+                key = category_chosen
+                if len(db.subcategories_map.get(category_chosen)) > 0:
+                    labels = list(db.subcategories_map.get(category_chosen))
+
+            compare = Compare(preview_frame, labels, 0)
+
+            def next():
+                if not compare.compare():
+                    showinfo(title='Comparing done', message="All pairs for this category have been compared!\n"
+                                                             "Saving opinions.")
+                # save()
+
+            next_button = Button(preview_frame, text="Next", font=FONT, command=next)
+            next_button.grid(row=2, column=0, columnspan=2, pady=10, padx=10)
+
+            def save():
+                # TODO zapisywanie zmian
+                for widget in preview_frame.winfo_children():
+                    widget.destroy()
+                pass
+
+            save_button = Button(preview_frame, text="Save", font=FONT, command=save)
+            save_button.grid(row=2, column=2, columnspan=2, pady=10, padx=10)
 
     matrix_button = Button(frame, text="Show matrix", font=FONT, command=show_matrix)
-    matrix_button.grid(row=5, columnspan=3, pady=10, padx=10)
+    matrix_button.grid(row=5, column=0, pady=10, padx=10)
+    expert_edit_button = Button(frame, text="Edit expert's opinions", font=FONT, command=edit_expert)
+    expert_edit_button.grid(row=5, column=2, columnspan=2, pady=10, padx=10)
 
     def _return():
         root.deiconify()
