@@ -87,7 +87,7 @@ country_no = 0
 
 def add_country(entry):
     global country_no
-    if entry.get() in db.countries_map:
+    if entry.get() in db.countries:
         showinfo(title='Invalid name!', message="Given country already exists in the database!")
     else:
         db.add_country(entry.get())
@@ -115,7 +115,7 @@ category_no = 0
 
 def add_category(entry):
     global category_no
-    if entry.get() in db.categories_map:
+    if entry.get() in db.categories:
         showinfo(title='Invalid name!', message="Given category already exists in the database!")
     else:
         db.add_category(entry.get())
@@ -142,7 +142,7 @@ expert_no = 0
 
 def add_expert(entry):
     global expert_no
-    if entry.get() in db.experts_map:
+    if entry.get() in db.experts:
         showinfo(title='Invalid name!', message="Given name already exists in the database!")
     else:
         db.add_expert(entry.get())
@@ -180,12 +180,12 @@ def preview():
     preview_frame = Frame(preview_window, bg="light grey", pady=10, padx=10)
     preview_frame.grid(row=0, column=1, padx=5, pady=5)
 
-    experts = list(db.experts_map.keys())
+    experts = list(db.experts.keys())
     experts_listbox = Listbox(frame, listvariable=Variable(value=experts), height=len(experts))
     experts_listbox.grid(row=0, column=0, padx=10, pady=10)
     # experts_listbox.itemconfig(1, {'bg': 'red'})
 
-    categories = list(db.categories_map.keys())
+    categories = list(db.categories.keys())
     categories_listbox = Listbox(frame, listvariable=Variable(value=categories), height=len(categories))
     categories_listbox.grid(row=0, column=1, padx=10, pady=10)
 
@@ -257,7 +257,7 @@ def preview():
                 widget.destroy()
 
             key = subcategories_chosen
-            labels = list(db.countries_map.keys())
+            labels = list(db.countries.keys())
             if subcategories_chosen == NO_SUBCATEGORY:
                 key = category_chosen
                 if len(db.subcategories_map.get(category_chosen)) > 0:
@@ -284,7 +284,7 @@ def preview():
                 widget.destroy()
 
             key = subcategories_chosen
-            labels = list(db.countries_map.keys())
+            labels = list(db.countries.keys())
             if subcategories_chosen == NO_SUBCATEGORY:
                 key = category_chosen
                 if len(db.subcategories_map.get(category_chosen)) > 0:

@@ -12,48 +12,85 @@ class DataBase:
         # TODO add loading from file
         self._subcategories_map: Dict[str, List[str]] = dict()
         self._matrices: Dict[str, List[np.array]] = dict()
-        self._experts_map = dict()
-        self._countries_map = dict()
-        self._categories_map = dict()
+        self._experts = []
+        self._countries = []
+        self._categories = []
+        self.generate_matrices()  # TODO replace with loading from file
 
     def add_expert(self, name: str) -> None:
-        self._experts_map[name] = len(self._experts_map)
+        self._experts.append(name)
+        for category, matrices in self._matrices.items():
+            matrices.append(np.identity(len(self._countries), dtype=np.float64))
 
     def add_country(self, name: str) -> None:
-        self._countries_map[name] = len(self._countries_map)
+        self._countries.append(name)
+        for category, subcategories in self._subcategories_map.items():
+            if not subcategories:
+                for matrix in self._matrices[category]:
+                    matrix = np.insert(matrix, len(self._countries) - 1, 0, axis=0)
+                    matrix = np.insert(matrix, len(self._countries) - 1, 0, axis=1)
+                    matrix[-1][-1] = 1
+            else:
+                for subcategory in subcategories:
+                    for matrix in self._matrices[subcategory]:
+                        matrix = np.insert(matrix, len(self._countries) - 1, 0, axis=0)
+                        matrix = np.insert(matrix, len(self._countries) - 1, 0, axis=1)
+                        matrix[-1][-1] = 1
 
     def generate_matrices(self) -> None:
         new_matrices = dict()
         for k, v in self._subcategories_map.items():
             if not v:
-                new_matrices[k] = [np.identity(len(self._countries_map), dtype=np.float64) for _ in range(len(self._experts_map))]
+                new_matrices[k] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
                 continue
-            new_matrices[k] = [np.identity(len(v), dtype=np.float64) for _ in range(len(self._experts_map))]
+            new_matrices[k] = [np.identity(len(v), dtype=np.float64) for _ in range(len(self._experts))]
             for sub in v:
-                new_matrices[sub] = [np.identity(len(self._countries_map), dtype=np.float64) for _ in range(len(self._experts_map))]
+                new_matrices[sub] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
         number_of_categories = len(self._subcategories_map.keys())
-        new_matrices['categories'] = [np.identity(number_of_categories, dtype=np.float64) for _ in range(len(self._experts_map))]
+        new_matrices['categories'] = [np.identity(number_of_categories, dtype=np.float64) for _ in range(len(self._experts))]
         self._matrices = new_matrices
 
     def add_category(self, category: str) -> None:
         self._subcategories_map[category] = []
-        self._categories_map[category] = len(self._categories_map)
+        self._categories.append(category)
+        for matrix in self._matrices['categories']:
+            matrix = np.insert(matrix, len(self._categories) - 1, 0, axis=0)
+            matrix = np.insert(matrix, len(self._categories) - 1, 0, axis=1)
+            matrix[-1][-1] = 1
+        self._matrices[category] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
 
     def add_subcategory(self, category: str, subcategory: str) -> None:
         if category not in self._subcategories_map.keys():
-            self._subcategories_map[category] = []
-            self._categories_map[category] = len(self._categories_map)
+            self.add_category(category)
         self._subcategories_map[category].append(subcategory)
+        if len(self._subcategories_map[category]) == 1: # if it's the first subcategory we need to make new matrix
+            for matrix in self._matrices[category]:
+                matrix = np.identity(1)
+        else:
+            for matrix in self._matrices[category]:
+                matrix = np.insert(matrix, len(self._subcategories_map[category]) - 1, 0, axis=0)
+                matrix = np.insert(matrix, len(self._subcategories_map[category]) - 1, 0, axis=1)
+                matrix[-1][-1] = 1
 
     def get_matrix(self, name: str, expert: Union[int, str]) -> np.array:
         if isinstance(expert, str):
-            expert = self._experts_map[expert]
+            expert = self._experts.index(expert)
         # for weight of categories use name 'categories'
         return deepcopy(self._matrices[name][expert])
 
-    def set_matrix_field(self, name: str, expert: Union[int, str], i: int, j: int, value: float) -> None:
+    def set_matrix_field(self, name: str, expert: Union[int, str], i: Union[int, str], j: Union[int, str], value: float) -> None:
         if isinstance(expert, str):
-            expert = self._experts_map[expert]
+            expert = self._experts.index(expert)
+        if isinstance(i, str):
+            if name in self._subcategories_map.keys():
+                i = self._subcategories_map[name].index(i)
+            else:
+                i = self._countries.index(i)
+        if isinstance(j, str):
+            if name in self._subcategories_map.keys():
+                j = self._subcategories_map[name].index(j)
+            else:
+                j = self._countries.index(j)
         self._matrices[name][expert][i][j] = value
 
 # not used anymore
@@ -77,17 +114,17 @@ class DataBase:
         return deepcopy(self._matrices)
 
     @property
-    def experts_map(self) -> Dict[str, List[str]]:
-        return deepcopy(self._experts_map)
+    def experts(self) -> List[str]:
+        return deepcopy(self._experts)
 
     @property
     def subcategories_map(self) -> Dict[str, List[str]]:
         return deepcopy(self._subcategories_map)
 
     @property
-    def countries_map(self) -> Dict[str, int]:
-        return deepcopy(self._countries_map)
+    def countries(self) -> List[str]:
+        return deepcopy(self._countries)
 
     @property
-    def categories_map(self) -> Dict[str, int]:
-        return deepcopy(self._categories_map)
+    def categories(self) -> List[str]:
+        return deepcopy(self._categories)

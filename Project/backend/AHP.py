@@ -29,10 +29,10 @@ class AHP:
             self._priority_vectors[k] = summed / matrix.shape[0]
 
     def calculate_ranking(self) -> Tuple[List[str], np.array]:
-        weights = np.zeros(len(self._db.countries_map))
+        weights = np.zeros(len(self._db.countries))
         subcategories_map = self._db.subcategories_map
-        countries = self._db.countries_map
-        categories = self._db.categories_map
+        countries = self._db.countries
+        categories = self._db.categories
         for country, i in countries.items():
             weight = 0
             for cat, subcategories in subcategories_map.items():
