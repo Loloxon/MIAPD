@@ -26,16 +26,12 @@ class DataBase:
         self._countries.append(name)
         for category, subcategories in self._subcategories_map.items():
             if not subcategories:
-                for matrix in self._matrices[category]:
-                    matrix = np.insert(matrix, len(self._countries) - 1, 0, axis=0)
-                    matrix = np.insert(matrix, len(self._countries) - 1, 0, axis=1)
-                    matrix[-1][-1] = 1
+                for i, matrix in enumerate(self._matrices[category]):
+                    self._matrices[category][i] = add_row_col(matrix)
             else:
                 for subcategory in subcategories:
-                    for matrix in self._matrices[subcategory]:
-                        matrix = np.insert(matrix, len(self._countries) - 1, 0, axis=0)
-                        matrix = np.insert(matrix, len(self._countries) - 1, 0, axis=1)
-                        matrix[-1][-1] = 1
+                    for i, matrix in enumerate(self._matrices[subcategory]):
+                        self._matrices[subcategory][i] = add_row_col(matrix)
 
     def generate_matrices(self) -> None:
         new_matrices = dict()
@@ -53,10 +49,8 @@ class DataBase:
     def add_category(self, category: str) -> None:
         self._subcategories_map[category] = []
         self._categories.append(category)
-        for matrix in self._matrices['categories']:
-            matrix = np.insert(matrix, len(self._categories) - 1, 0, axis=0)
-            matrix = np.insert(matrix, len(self._categories) - 1, 0, axis=1)
-            matrix[-1][-1] = 1
+        for i, matrix in enumerate(self._matrices['categories']):
+            self._matrices['categories'][i] = add_row_col(matrix)
         self._matrices[category] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
 
     def add_subcategory(self, category: str, subcategory: str) -> None:
@@ -64,13 +58,12 @@ class DataBase:
             self.add_category(category)
         self._subcategories_map[category].append(subcategory)
         if len(self._subcategories_map[category]) == 1: # if it's the first subcategory we need to make new matrix
-            for matrix in self._matrices[category]:
-                matrix = np.identity(1)
+            self._matrices[category] = [np.identity(1, dtype=np.float64) for _ in range(len(self._experts))]
         else:
-            for matrix in self._matrices[category]:
-                matrix = np.insert(matrix, len(self._subcategories_map[category]) - 1, 0, axis=0)
-                matrix = np.insert(matrix, len(self._subcategories_map[category]) - 1, 0, axis=1)
-                matrix[-1][-1] = 1
+            for i, matrix in enumerate(self._matrices[category]):
+                self._matrices[category][i] = add_row_col(matrix)
+
+        self._matrices[subcategory] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
 
     def get_matrix(self, name: str, expert: Union[int, str]) -> np.array:
         if isinstance(expert, str):
@@ -128,3 +121,10 @@ class DataBase:
     @property
     def categories(self) -> List[str]:
         return deepcopy(self._categories)
+
+
+def add_row_col(matrix: np.array) -> np.array:
+    matrix = np.insert(matrix, matrix.shape[0], 0, axis=0)
+    matrix = np.insert(matrix, matrix.shape[1], 0, axis=1)
+    matrix[-1][-1] = 1
+    return matrix

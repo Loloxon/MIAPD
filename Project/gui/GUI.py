@@ -40,7 +40,6 @@ def init(db):
     db.add_subcategory('capacity', 'passenger')
     db.add_category('warranty')
 
-    db.generate_matrices()
 
     db.set_matrix('cost', 'expert1', np.array([[1, 7, 8], [1 / 7, 1, 3], [1 / 8, 1 / 3, 1]]))
     db.set_matrix('purchase', 'expert1', np.array(
