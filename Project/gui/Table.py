@@ -8,7 +8,7 @@ class Table:
 
     def __init__(self, root, values, labels, label_root, name):
         self.name = Entry(label_root, fg='blue', font=FONT_BIG, width=40, justify=CENTER)
-        self.name.grid(sticky=S)
+        self.name.grid(row=0)
         self.name.insert("end", name)
         self.name.config(state=DISABLED)
         for i in range(len(labels)):

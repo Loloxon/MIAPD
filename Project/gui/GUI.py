@@ -174,11 +174,11 @@ column_no = 0
 row_no = 1
 country_no = 0
 
-country_list = Text(main_window, font=FONT, width=20)
+country_list = Text(main_window, font=FONT, width=20, height=18)
 for country in db.countries:
     country_list.insert("end", "● " + country + "\n")
 country_list.config(state=DISABLED)
-country_list.grid(row=row_no + 3, column=column_no, padx=15, pady=5)
+country_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
 def add_country(entry):
     global country_no
     if entry.get() in db.countries:
@@ -209,13 +209,13 @@ column_no = 1
 row_no = 1
 category_no = 0
 
-category_list = Text(main_window, font=FONT, width=20)
+category_list = Text(main_window, font=FONT, width=20, height=18)
 for category in db.categories:
     category_list.insert("end", "● " + category + "\n")
     for subcategory in db.subcategories_map.get(category):
         category_list.insert("end", "   - " + subcategory + "\n")
 category_list.config(state=DISABLED)
-category_list.grid(row=row_no + 3, column=column_no, padx=15, pady=5)
+category_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
 def add_category(entry):
     global category_no
     if entry.get() in db.categories:
@@ -249,11 +249,11 @@ column_no = 2
 row_no = 1
 expert_no = 0
 
-expert_list = Text(main_window, font=FONT, width=20)
+expert_list = Text(main_window, font=FONT, width=20, height=18)
 for category in db.experts:
     expert_list.insert("end", "● " + category + "\n")
 expert_list.config(state=DISABLED)
-expert_list.grid(row=row_no + 3, column=column_no, padx=15, pady=5)
+expert_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
 def add_expert(entry):
     global expert_no
     if entry.get() in db.experts:
