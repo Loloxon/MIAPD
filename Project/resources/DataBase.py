@@ -94,13 +94,16 @@ class DataBase:
     #     # for weight of categories use name 'categories'
     #     self._matrices[name][expert] = matrix
 
-    def is_missing_data(self) -> List[Tuple[str, int]]:
+    def is_missing_data(self) -> List[Tuple[str, List[str]]]:
         # return list of tuples with matrix name and expert index
         missing_matrices = []
-        for k, v in self._matrices.items():
-            for i, matrix in enumerate(v):
-                if (matrix <= 0).any():
-                    missing_matrices.append((k, i))
+        for i in range(len(self._experts)):
+            missing_for_expert = []
+            for k, v in self._matrices.items():
+                if (v[i] <= 0).any():
+                    missing_for_expert.append(k)
+            if missing_for_expert:
+                missing_matrices.append((self._experts[i], missing_for_expert))
         return missing_matrices
 
     @property
