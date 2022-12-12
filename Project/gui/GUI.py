@@ -40,33 +40,108 @@ def init(db):
     db.add_subcategory('capacity', 'passenger')
     db.add_category('warranty')
 
+    array = np.array([[1, 7, 8], [1 / 7, 1, 3], [1 / 8, 1 / 3, 1]])
+    matrix = "cost"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('cost', 'expert1', np.array([[1, 7, 8], [1 / 7, 1, 3], [1 / 8, 1 / 3, 1]]))
 
-    db.set_matrix('cost', 'expert1', np.array([[1, 7, 8], [1 / 7, 1, 3], [1 / 8, 1 / 3, 1]]))
-    db.set_matrix('purchase', 'expert1', np.array(
-        [[1, 7 / 5, 4 / 9, 4 / 5], [5 / 7, 1, 6 / 7, 7 / 6], [9 / 4, 7 / 6, 1, 3 / 2], [5 / 4, 6 / 7, 2 / 3, 1]]))
-    db.set_matrix('fuel', 'expert1', np.array(
-        [[1, 7 / 3, 9 / 5, 2], [3 / 7, 1, 8 / 5, 8 / 5], [5 / 9, 5 / 8, 1, 2], [1 / 2, 5 / 8, 1 / 2, 1]]))
-    db.set_matrix('maintenance', 'expert1', np.array(
-        [[1, 7 / 5, 4 / 3, 5 / 9], [5 / 7, 1, 2, 6 / 5], [3 / 4, 1 / 2, 1, 3 / 2], [9 / 5, 5 / 6, 2 / 3, 1]]))
+    array = np.array([[1, 7 / 5, 4 / 9, 4 / 5], [5 / 7, 1, 6 / 7, 7 / 6], [9 / 4, 7 / 6, 1, 3 / 2], [5 / 4, 6 / 7, 2 / 3, 1]])
+    matrix = "purchase"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('purchase', 'expert1', np.array(
+    #     [[1, 7 / 5, 4 / 9, 4 / 5], [5 / 7, 1, 6 / 7, 7 / 6], [9 / 4, 7 / 6, 1, 3 / 2], [5 / 4, 6 / 7, 2 / 3, 1]]))
 
-    db.set_matrix('safety', 'expert1',
-                  np.array([[1, 2 / 5, 1 / 9, 1 / 7], [2 / 5, 1, 1 / 9, 1 / 4], [9, 9, 1, 5], [7, 4, 1 / 5, 1]]))
+    array = np.array([[1, 7 / 3, 9 / 5, 2], [3 / 7, 1, 8 / 5, 8 / 5], [5 / 9, 5 / 8, 1, 2], [1 / 2, 5 / 8, 1 / 2, 1]])
+    matrix = "fuel"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('fuel', 'expert1', np.array(
+    #     [[1, 7 / 3, 9 / 5, 2], [3 / 7, 1, 8 / 5, 8 / 5], [5 / 9, 5 / 8, 1, 2], [1 / 2, 5 / 8, 1 / 2, 1]]))
 
-    db.set_matrix('design', 'expert1',
-                  np.array([[1, 1 / 9, 1 / 9, 1 / 9], [9, 1, 5, 9 / 8], [9, 1 / 5, 1, 7 / 9], [9, 8 / 9, 9 / 7, 1]]))
+    array = np.array([[1, 7 / 5, 4 / 3, 5 / 9], [5 / 7, 1, 2, 6 / 5], [3 / 4, 1 / 2, 1, 3 / 2], [9 / 5, 5 / 6, 2 / 3, 1]])
+    matrix = "maintenance"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('maintenance', 'expert1', np.array(
+    #     [[1, 7 / 5, 4 / 3, 5 / 9], [5 / 7, 1, 2, 6 / 5], [3 / 4, 1 / 2, 1, 3 / 2], [9 / 5, 5 / 6, 2 / 3, 1]]))
 
-    db.set_matrix('capacity', 'expert1', np.array([[1, 3], [1 / 3, 1]]))
-    db.set_matrix('trunk', 'expert1', np.array(
-        [[1, 6 / 5, 2 / 3, 5 / 2], [5 / 6, 1, 5 / 9, 7 / 5], [3 / 2, 9 / 5, 1, 1], [2 / 5, 5 / 7, 1, 1]]))
-    db.set_matrix('passenger', 'expert1',
-                  np.array([[1, 9, 9, 3 / 8], [1 / 9, 1, 2 / 3, 1 / 9], [1 / 9, 3 / 2, 1, 1 / 9], [8 / 3, 9, 9, 1]]))
+    array = np.array([[1, 2 / 5, 1 / 9, 1 / 7], [2 / 5, 1, 1 / 9, 1 / 4], [9, 9, 1, 5], [7, 4, 1 / 5, 1]])
+    matrix = "safety"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('safety', 'expert1',
+    #               np.array([[1, 2 / 5, 1 / 9, 1 / 7], [2 / 5, 1, 1 / 9, 1 / 4], [9, 9, 1, 5], [7, 4, 1 / 5, 1]]))
 
-    db.set_matrix('warranty', 'expert1',
-                  np.array([[1, 9, 4 / 3, 7 / 5], [1 / 9, 1, 1 / 9, 1 / 9], [3 / 4, 9, 1, 1 / 2], [5 / 7, 9, 2, 1]]))
+    array = np.array([[1, 1 / 9, 1 / 9, 1 / 9], [9, 1, 5, 9 / 8], [9, 1 / 5, 1, 7 / 9], [9, 8 / 9, 9 / 7, 1]])
+    matrix = "design"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('design', 'expert1',
+    #               np.array([[1, 1 / 9, 1 / 9, 1 / 9], [9, 1, 5, 9 / 8], [9, 1 / 5, 1, 7 / 9], [9, 8 / 9, 9 / 7, 1]]))
 
-    db.set_matrix('categories', 'expert1', np.array(
+
+
+    array = np.array([[1, 3], [1 / 3, 1]])
+    matrix = "capacity"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('capacity', 'expert1', np.array([[1, 3], [1 / 3, 1]]))
+
+    array = np.array(
+        [[1, 6 / 5, 2 / 3, 5 / 2], [5 / 6, 1, 5 / 9, 7 / 5], [3 / 2, 9 / 5, 1, 1], [2 / 5, 5 / 7, 1, 1]])
+    matrix = "trunk"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('trunk', 'expert1', np.array(
+    #     [[1, 6 / 5, 2 / 3, 5 / 2], [5 / 6, 1, 5 / 9, 7 / 5], [3 / 2, 9 / 5, 1, 1], [2 / 5, 5 / 7, 1, 1]]))
+
+    array = np.array([[1, 9, 9, 3 / 8], [1 / 9, 1, 2 / 3, 1 / 9], [1 / 9, 3 / 2, 1, 1 / 9], [8 / 3, 9, 9, 1]])
+    matrix = "passenger"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('passenger', 'expert1',
+    #               np.array([[1, 9, 9, 3 / 8], [1 / 9, 1, 2 / 3, 1 / 9], [1 / 9, 3 / 2, 1, 1 / 9], [8 / 3, 9, 9, 1]]))
+
+    array = np.array([[1, 9, 4 / 3, 7 / 5], [1 / 9, 1, 1 / 9, 1 / 9], [3 / 4, 9, 1, 1 / 2], [5 / 7, 9, 2, 1]])
+    matrix = "warranty"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('warranty', 'expert1',
+    #               np.array([[1, 9, 4 / 3, 7 / 5], [1 / 9, 1, 1 / 9, 1 / 9], [3 / 4, 9, 1, 1 / 2], [5 / 7, 9, 2, 1]]))
+
+    array = np.array(
         [[1, 7 / 5, 5, 9 / 5, 8], [5 / 7, 1, 9 / 5, 7 / 5, 5 / 4], [1 / 5, 5 / 9, 1, 3 / 7, 3 / 4],
-         [5 / 9, 5 / 7, 7 / 3, 1, 7 / 9], [1 / 8, 4 / 5, 4 / 3, 9 / 7, 1]]))
+         [5 / 9, 5 / 7, 7 / 3, 1, 7 / 9], [1 / 8, 4 / 5, 4 / 3, 9 / 7, 1]])
+    matrix = "categories"
+    expert = "expert1"
+    for i in range(len(array)):
+        for j in range(len(array[0])):
+            db.set_matrix_field(matrix, expert, i, j, array[i][j])
+    # db.set_matrix('categories', 'expert1', np.array(
+    #     [[1, 7 / 5, 5, 9 / 5, 8], [5 / 7, 1, 9 / 5, 7 / 5, 5 / 4], [1 / 5, 5 / 9, 1, 3 / 7, 3 / 4],
+    #      [5 / 9, 5 / 7, 7 / 3, 1, 7 / 9], [1 / 8, 4 / 5, 4 / 3, 9 / 7, 1]]))
 
 
 init(db)
@@ -80,7 +155,7 @@ init(db)
 #####################################           COUNTRY           #####################################
 
 column_no = 0
-row_no = 0
+row_no = 1
 country_no = 0
 
 
@@ -108,7 +183,7 @@ add_country_button.grid(row=row_no + 2, column=column_no)
 #####################################           CRITERION           #####################################
 
 column_no = 1
-row_no = 0
+row_no = 1
 category_no = 0
 
 
@@ -135,7 +210,7 @@ add_category_button.grid(row=row_no + 2, column=column_no, padx=50)
 #####################################           EXPERT           #####################################
 
 column_no = 2
-row_no = 0
+row_no = 1
 expert_no = 0
 
 
@@ -145,6 +220,141 @@ def add_expert(entry):
         showinfo(title='Invalid name!', message="Given name already exists in the database!")
     else:
         db.add_expert(entry.get())
+
+        root.withdraw()
+        new_expert_window = Toplevel()
+        new_expert_window.title("Opinions")
+        new_expert_window.geometry("720x480")
+        # "1024x576"
+        new_expert_window.resizable(False, False)
+
+        frame = Frame(new_expert_window, bg="light grey", pady=10, padx=10)
+        frame.grid(row=0, column=0, padx=5, pady=5)
+
+        # key = subcategories_chosen
+        all_labels = []
+        # labels = list(db.countries_map.keys())
+
+        countries = db.countries
+        sub = []
+        for category in db.categories:
+            if len(db.subcategories_map.get(category)) > 0:
+                for subcategory in db.subcategories_map.get(category):
+                    sub.append([category, subcategory])
+                sub.append([category, category])
+                # przechodze przez wszystkie podkategorie i porownuje kraje
+                # na koncu powordnuje podkategorie
+            else:
+                sub.append([category])
+                # porownuje kraje
+
+        labels = []
+        names = []
+        for s in sub:
+            if len(s) == 2:
+                if s[0] != s[1]:
+                    labels.append("Comparison for " + str(s[1]) + " from " + str(s[0]))
+                    names.append(countries)
+                    # #dla s[0] _ s[1]
+                else:
+                    labels.append("Comparison for weights within " + str(s[0]))
+                    names.append(db.subcategories_map.get(s[0]))
+                    # #dla s[0] wagi podkategorii
+            else:
+                labels.append("Comparison for " + str(s[0]))
+                names.append(countries)
+                # # dla s[0]
+
+        idx = 0
+        e_label = Entry(frame, fg='black', font=FONT, width=50, justify=CENTER)
+        e_label.grid(row=0, column=0, columnspan=4)
+        e_label.config(state=DISABLED)
+        e1 = Entry(frame, fg='black', font=FONT, width=20, justify=CENTER)
+        e1.grid(row=1, column=0)
+        e1.config(state=DISABLED)
+        s1 = Scale(frame, from_=9, to=1, width=25)
+        s1.grid(row=1, column=1, padx=5)
+        s2 = Scale(frame, from_=9, to=1, width=25)
+        s2.grid(row=1, column=2, padx=5)
+        e2 = Entry(frame, fg='black', font=FONT, width=20, justify=CENTER)
+        e2.grid(row=1, column=3)
+        e2.config(state=DISABLED)
+
+        previous_idx1 = -1
+        previous_idx2 = -1
+
+        expert_chosen = "idk"
+        category_chosen = "idk"
+        subcategories_chosen = "idk"
+
+        def _next():
+            nonlocal idx, names, labels, e_label, e1, e2, s1, s2, previous_idx1, previous_idx2, expert_chosen, \
+                category_chosen, subcategories_chosen
+            finishing = True
+            _break = False
+
+            if idx > 0:
+                # print(previous_idx1, "to", previous_idx2, s1.get() / s2.get(), "for", expert_chosen,
+                #       category_chosen, subcategories_chosen)
+
+                true_category = category_chosen
+                if subcategories_chosen != NO_SUBCATEGORY:
+                    true_category = subcategories_chosen
+                # print(true_category, expert_chosen, previous_idx1, previous_idx2, s1.get() / s2.get())
+                db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1, s1.get() / s2.get())
+
+            idx_copy = idx
+            for idx1 in range(len(names)):
+                for idx2 in range(idx1 + 1, len(names)):
+                    if idx_copy == 0:
+                        idx += 1
+                        finishing = False
+                        current_name1 = names[idx1]
+                        current_name2 = names[idx2]
+                        previous_idx1 = idx1
+                        previous_idx2 = idx2
+                        _break = True
+                    if _break:
+                        break
+                    idx_copy -= 1
+                if _break:
+                    break
+
+            if finishing:
+                showinfo(title='Comparing done', message="All pairs for this category have been compared!\n"
+                                                         "Saving opinions.")
+                save()
+            else:
+                e_label.config(state=NORMAL)
+                e_label.delete(0, "end")
+                e_label.insert(0, labels)
+                e_label.config(state=DISABLED)
+
+                e1.config(state=NORMAL)
+                e1.delete(0, "end")
+                e1.insert(0, current_name1)
+                e1.config(state=DISABLED)
+
+                e2.config(state=NORMAL)
+                e2.delete(0, "end")
+                e2.insert(0, current_name2)
+                e2.config(state=DISABLED)
+
+        # TODO dodawanie do database
+        _next()
+
+        next_button = Button(frame, text="Next", font=FONT, command=next)
+        next_button.grid(row=2, column=0, columnspan=2, pady=10, padx=10)
+
+        def save():
+            # TODO zapisywanie zmian
+            root.deiconify()
+            new_expert_window.destroy()
+            pass
+
+        save_button = Button(frame, text="Save and return", font=FONT, command=save)
+        save_button.grid(row=2, column=2, columnspan=2, pady=10, padx=10)
+
     expert_no += 1
     entry.delete(0, "end")
     entry.insert(0, "Unknown Expert " + str(expert_no))
@@ -162,7 +372,7 @@ add_expert_button.grid(row=row_no + 2, column=column_no, padx=50)
 #####################################           EXPERTS' PREVIEW           #####################################
 
 column_no = 3
-row_no = 3
+row_no = 4
 
 
 def preview():
@@ -174,17 +384,17 @@ def preview():
     preview_window.resizable(False, False)
 
     frame = Frame(preview_window, bg="light grey", pady=10, padx=10)
-    frame.grid(row=0, column=0, padx=5, pady=5)
+    frame.grid(row=0, column=0, padx=15, pady=15)
 
     preview_frame = Frame(preview_window, bg="light grey", pady=10, padx=10)
     preview_frame.grid(row=0, column=1, padx=5, pady=5)
 
-    experts = list(db.experts.keys())
+    experts = db.experts
     experts_listbox = Listbox(frame, listvariable=Variable(value=experts), height=len(experts))
     experts_listbox.grid(row=0, column=0, padx=10, pady=10)
     # experts_listbox.itemconfig(1, {'bg': 'red'})
 
-    categories = list(db.categories.keys())
+    categories = db.categories
     categories_listbox = Listbox(frame, listvariable=Variable(value=categories), height=len(categories))
     categories_listbox.grid(row=0, column=1, padx=10, pady=10)
 
@@ -256,7 +466,7 @@ def preview():
                 widget.destroy()
 
             key = subcategories_chosen
-            labels = list(db.countries.keys())
+            labels = db.countries
             if subcategories_chosen == NO_SUBCATEGORY:
                 key = category_chosen
                 if len(db.subcategories_map.get(category_chosen)) > 0:
@@ -273,31 +483,108 @@ def preview():
             save_button = Button(preview_frame, text="Save", font=FONT, command=save)
             save_button.grid(row=len(labels) + 1, columnspan=len(labels) + 1, pady=10, padx=10)
 
-    def edit_expert():
+    def add_opinion():
         if not chosen_options:
             showinfo(title='Missing data', message="First you need to choice all the options from lists!")
+            # TODO if chosen are not missing
+        # elif True:
+        #     showinfo(title='All opinions given', message="No need to add more opinions as all of them have been "
+        #                                                  "already given.")
         else:
             nonlocal expert_chosen, category_chosen, subcategories_chosen
 
             for widget in preview_frame.winfo_children():
                 widget.destroy()
 
-            key = subcategories_chosen
-            labels = list(db.countries.keys())
+            names = db.countries
+            print(names)
+            label = ""
+
             if subcategories_chosen == NO_SUBCATEGORY:
-                key = category_chosen
+                # key = category_chosen
                 if len(db.subcategories_map.get(category_chosen)) > 0:
-                    labels = list(db.subcategories_map.get(category_chosen))
+                    names = list(db.subcategories_map.get(category_chosen))
+                    label = "Comparison " + expert_chosen + " for weights within " + category_chosen
+                else:
+                    label = "Comparison " + expert_chosen + " for " + category_chosen
+            else:
+                label = "Comparison " + expert_chosen + " for " + subcategories_chosen + " from " + category_chosen
 
-            compare = Compare(preview_frame, labels, 0)
+            idx = 0
+            e_label = Entry(preview_frame, fg='black', font=FONT, width=50, justify=CENTER)
+            e_label.grid(row=0, column=0, columnspan=4)
+            e_label.config(state=DISABLED)
+            e1 = Entry(preview_frame, fg='black', font=FONT, width=20, justify=CENTER)
+            e1.grid(row=1, column=0)
+            e1.config(state=DISABLED)
+            s1 = Scale(preview_frame, from_=9, to=1, width=25)
+            s1.grid(row=1, column=1, padx=5)
+            s2 = Scale(preview_frame, from_=9, to=1, width=25)
+            s2.grid(row=1, column=2, padx=5)
+            e2 = Entry(preview_frame, fg='black', font=FONT, width=20, justify=CENTER)
+            e2.grid(row=1, column=3)
+            e2.config(state=DISABLED)
 
-            def next():
-                if not compare.compare():
+            previous_idx1 = -1
+            previous_idx2 = -1
+
+            def _next():
+                nonlocal idx, names, label, e_label, e1, e2, s1, s2, previous_idx1, previous_idx2, expert_chosen, \
+                    category_chosen, subcategories_chosen
+                finishing = True
+                _break = False
+
+                if idx > 0:
+                    # print(previous_idx1, "to", previous_idx2, s1.get() / s2.get(), "for", expert_chosen,
+                    #       category_chosen, subcategories_chosen)
+
+                    true_category = category_chosen
+                    if subcategories_chosen != NO_SUBCATEGORY:
+                        true_category = subcategories_chosen
+                    # print(true_category, expert_chosen, previous_idx1, previous_idx2, s1.get() / s2.get())
+                    db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1, s1.get() / s2.get())
+
+                idx_copy = idx
+                for idx1 in range(len(names)):
+                    for idx2 in range(idx1 + 1, len(names)):
+                        if idx_copy == 0:
+                            idx += 1
+                            finishing = False
+                            current_name1 = names[idx1]
+                            current_name2 = names[idx2]
+                            previous_idx1 = idx1
+                            previous_idx2 = idx2
+                            _break = True
+                        if _break:
+                            break
+                        idx_copy -= 1
+                    if _break:
+                        break
+
+                if finishing:
                     showinfo(title='Comparing done', message="All pairs for this category have been compared!\n"
                                                              "Saving opinions.")
-                # save()
+                    save()
+                else:
+                    e_label.config(state=NORMAL)
+                    e_label.delete(0, "end")
+                    e_label.insert(0, label)
+                    e_label.config(state=DISABLED)
 
-            next_button = Button(preview_frame, text="Next", font=FONT, command=next)
+                    e1.config(state=NORMAL)
+                    e1.delete(0, "end")
+                    e1.insert(0, current_name1)
+                    e1.config(state=DISABLED)
+
+                    e2.config(state=NORMAL)
+                    e2.delete(0, "end")
+                    e2.insert(0, current_name2)
+                    e2.config(state=DISABLED)
+
+            # TODO dodawanie do database
+            _next()
+
+            next_button = Button(preview_frame, text="Next", font=FONT, command=_next)
             next_button.grid(row=2, column=0, columnspan=2, pady=10, padx=10)
 
             def save():
@@ -311,8 +598,8 @@ def preview():
 
     matrix_button = Button(frame, text="Show matrix", font=FONT, command=show_matrix)
     matrix_button.grid(row=5, column=0, pady=10, padx=10)
-    expert_edit_button = Button(frame, text="Edit expert's opinions", font=FONT, command=edit_expert)
-    expert_edit_button.grid(row=5, column=2, columnspan=2, pady=10, padx=10)
+    add_opinion_button = Button(frame, text="Edit expert's opinions", font=FONT, command=add_opinion)
+    add_opinion_button.grid(row=5, column=2, columnspan=2, pady=10, padx=10)
 
     def _return():
         root.deiconify()
@@ -339,7 +626,7 @@ def solve():
 
         results = Toplevel()
         results.title("Ranking")
-        results.geometry("800x800")
+        results.geometry("1600x800")
         # "1024x576"
         results.resizable(False, False)
 
@@ -361,12 +648,13 @@ def solve():
         top = ranking[0][1]
         multi = 100 / top
         for country in ranking:
-            label_tmp = Label(frame, text=country[0], font=("Arial", round(country[1] * multi)))
+            label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                              font=("Arial", round(country[1] * multi)))
             label_tmp.grid(sticky=S)
             labels.append(label_tmp)
 
 
-buttonSolve = Button(main_window, text="Solve", font=("Arial", 30), command=solve, bg="blue", fg="pink", width=20)
-buttonSolve.grid(sticky=S, columnspan=5, pady=10, padx=10)
+buttonSolve = Button(main_window, text="Solve", font=("Arial", 26), command=solve, bg="blue", fg="pink", width=40)
+buttonSolve.grid(row=0, sticky=N, columnspan=5, pady=10, padx=10)
 
 main_window.mainloop()

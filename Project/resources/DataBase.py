@@ -85,6 +85,7 @@ class DataBase:
             else:
                 j = self._countries.index(j)
         self._matrices[name][expert][i][j] = value
+        self._matrices[name][expert][j][i] = 1/value
 
 # not used anymore
     # def set_matrix(self, name: str, expert: Union[int, str], matrix: np.array) -> None:
