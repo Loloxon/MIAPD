@@ -65,6 +65,38 @@ class DataBase:
 
         self._matrices[subcategory] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
 
+    def remove_expert(self, name: str) -> None:
+        for category, matrices in self._matrices.items():
+            matrices.pop(self._experts.index(name))
+        self._experts.remove(name)
+
+    def remove_country(self, name: str) -> None:
+        for category, subcategories in self._subcategories_map.items():
+            if not subcategories:
+                for i, matrix in enumerate(self._matrices[category]):
+                    self._matrices[category][i] = remove_row_col(matrix, self._countries.index(name))
+            else:
+                for subcategory in subcategories:
+                    for i, matrix in enumerate(self._matrices[subcategory]):
+                        self._matrices[subcategory][i] = remove_row_col(matrix, self._countries.index(name))
+        self._countries.remove(name)
+
+    def remove_category(self, name: str) -> None:
+        # removes category and all subcategories associated with it
+        for i, matrix in enumerate(self._matrices['categories']):
+            self._matrices['categories'][i] = remove_row_col(matrix, self._categories.index(name))
+        for subcategory in self._subcategories_map[name]:
+            self._matrices.pop(subcategory)
+        self._matrices.pop(name)
+        self._categories.remove(name)
+        self._subcategories_map.pop(name)
+
+    def remove_subcategory(self, category: str, subcategory: str) -> None:
+        for i, matrix in enumerate(self._matrices[category]):
+            self._matrices[category][i] = remove_row_col(matrix, self._subcategories_map[category].index(subcategory))
+        self._matrices.pop(subcategory)
+        self._subcategories_map[category].remove(subcategory)
+
     def get_matrix(self, name: str, expert: Union[int, str]) -> np.array:
         if isinstance(expert, str):
             expert = self._experts.index(expert)
@@ -131,4 +163,10 @@ def add_row_col(matrix: np.array) -> np.array:
     matrix = np.insert(matrix, matrix.shape[0], 0, axis=0)
     matrix = np.insert(matrix, matrix.shape[1], 0, axis=1)
     matrix[-1][-1] = 1
+    return matrix
+
+
+def remove_row_col(matrix: np.array, index: int) -> np.array:
+    matrix = np.delete(matrix, index, axis=0)
+    matrix = np.delete(matrix, index, axis=1)
     return matrix
