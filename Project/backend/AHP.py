@@ -33,18 +33,18 @@ class AHP:
         subcategories_map = self._db.subcategories_map
         countries = self._db.countries
         categories = self._db.categories
-        for country, i in countries.items():
+        for i, country in enumerate(countries):
             weight = 0
             for cat, subcategories in subcategories_map.items():
                 if not subcategories:
-                    weight += self._priority_vectors[cat][i]*self._priority_vectors['categories'][categories[cat]]
+                    weight += self._priority_vectors[cat][i]*self._priority_vectors['categories'][categories.index(cat)]
                     continue
                 partial_weight = 0
                 for j, sub in enumerate(subcategories):
                     partial_weight += self._priority_vectors[sub][i] * self._priority_vectors[cat][j]
-                weight += partial_weight * self._priority_vectors['categories'][categories[cat]]
+                weight += partial_weight * self._priority_vectors['categories'][categories.index(cat)]
             weights[i] = weight
-        country_ranking = sorted(countries.keys(), key=lambda x: weights[countries[x]], reverse=True)
+        country_ranking = [country for _, country in sorted(zip(weights, countries), reverse=True)]
         return country_ranking, sorted(weights, reverse=True)
 
 
