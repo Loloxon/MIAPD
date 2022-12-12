@@ -134,7 +134,6 @@ class DataBase:
             for k, v in self._matrices.items():
                 if (v[i] <= 0).any():
                     missing_for_expert.append(k)
-            missing_for_expert = missing_for_expert[1:]
             if missing_for_expert:
                 missing_matrices.append((self._experts[i], missing_for_expert))
         return missing_matrices
