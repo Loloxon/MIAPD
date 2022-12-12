@@ -117,7 +117,7 @@ class DataBase:
             else:
                 j = self._countries.index(j)
         self._matrices[name][expert][i][j] = value
-        self._matrices[name][expert][j][i] = 1/value
+        self._matrices[name][expert][j][i] = max(min(1/value, 9), 1/9)
 
 # not used anymore
     # def set_matrix(self, name: str, expert: Union[int, str], matrix: np.array) -> None:
@@ -134,6 +134,7 @@ class DataBase:
             for k, v in self._matrices.items():
                 if (v[i] <= 0).any():
                     missing_for_expert.append(k)
+            missing_for_expert = missing_for_expert[1:]
             if missing_for_expert:
                 missing_matrices.append((self._experts[i], missing_for_expert))
         return missing_matrices
