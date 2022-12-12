@@ -13,11 +13,11 @@ NO_SUBCATEGORY = "<no subcategory>"
 
 root = Tk()
 root.title("Comparing App")
-root.geometry("1280x720")
+root.geometry("1600x900")
 root.resizable(False, False)
 
 main_window = Frame(root, relief='sunken')
-main_window.pack(fill=BOTH, expand=True, padx=10, pady=10)
+main_window.pack(fill=BOTH, expand=True, padx=100, pady=10)
 
 db = DataBase()
 
@@ -173,23 +173,31 @@ column_no = 0
 row_no = 1
 country_no = 0
 
+country_list = Text(main_window, font=FONT, width=20)
+for country in db.countries:
+    country_list.insert("end", "● " + country + "\n")
+country_list.config(state=DISABLED)
+country_list.grid(row=row_no + 3, column=column_no, padx=15, pady=5)
 def add_country(entry):
     global country_no
     if entry.get() in db.countries:
         showinfo(title='Invalid name!', message="Given country already exists in the database!")
     else:
         db.add_country(entry.get())
+        country_list.config(state=NORMAL)
+        country_list.insert("end", "● " + entry.get() + "\n")
+        country_list.config(state=DISABLED)
     db.generate_matrices()
     country_no += 1
     entry.delete(0, "end")
     entry.insert(0, "Unknown Country " + str(country_no))
 
 
-add_country_label = Label(main_window, text="Enter the country", font=LABEL_FONT)
+add_country_label = Label(main_window, text="Enter new country", font=LABEL_FONT)
 add_country_label.grid(row=row_no + 0, column=column_no)
 add_country_entry = Entry(main_window, width=20, font=FONT, bd=1)
 add_country_entry.insert(0, "Unknown Country 0")
-add_country_entry.grid(row=row_no + 1, column=column_no, padx=10, pady=5)
+add_country_entry.grid(row=row_no + 1, column=column_no, padx=15, pady=5)
 add_country_button = Button(main_window, text="Add new country", font=FONT,
                             command=lambda: add_country(add_country_entry))
 add_country_button.grid(row=row_no + 2, column=column_no)
@@ -200,23 +208,36 @@ column_no = 1
 row_no = 1
 category_no = 0
 
-
+category_list = Text(main_window, font=FONT, width=20)
+for category in db.categories:
+    category_list.insert("end", "● " + category + "\n")
+    for subcategory in db.subcategories_map.get(category):
+        category_list.insert("end", "   - " + subcategory + "\n")
+category_list.config(state=DISABLED)
+category_list.grid(row=row_no + 3, column=column_no, padx=15, pady=5)
 def add_category(entry):
     global category_no
     if entry.get() in db.categories:
         showinfo(title='Invalid name!', message="Given category already exists in the database!")
     else:
         db.add_category(entry.get())
+        category_list.config(state=NORMAL)
+        category_list.insert("end", "● " + entry.get() + "\n")
+        category_list.config(state=DISABLED)
+        for subcategory in db.subcategories_map.get(entry.get()):
+            category_list.config(state=NORMAL)
+            category_list.insert("end", " - " + subcategory + "\n")
+            category_list.config(state=DISABLED)
     category_no += 1
     entry.delete(0, "end")
     entry.insert(0, "Unknown Criterion " + str(category_no))
 
 
-add_category_label = Label(main_window, text="Enter the category", font=LABEL_FONT)
+add_category_label = Label(main_window, text="Enter new category", font=LABEL_FONT)
 add_category_label.grid(row=row_no + 0, column=column_no)
 add_category_entry = Entry(main_window, width=20, font=FONT)
 add_category_entry.insert(0, "Unknown Criterion 0")
-add_category_entry.grid(row=row_no + 1, column=column_no, padx=10, pady=5)
+add_category_entry.grid(row=row_no + 1, column=column_no, padx=15, pady=5)
 add_category_button = Button(main_window, text="Add new category", font=FONT,
                              command=lambda: add_category(add_category_entry))
 add_category_button.grid(row=row_no + 2, column=column_no, padx=50)
@@ -227,13 +248,20 @@ column_no = 2
 row_no = 1
 expert_no = 0
 
-
+expert_list = Text(main_window, font=FONT, width=20)
+for category in db.experts:
+    expert_list.insert("end", "● " + category + "\n")
+expert_list.config(state=DISABLED)
+expert_list.grid(row=row_no + 3, column=column_no, padx=15, pady=5)
 def add_expert(entry):
     global expert_no
     if entry.get() in db.experts:
         showinfo(title='Invalid name!', message="Given name already exists in the database!")
     else:
         db.add_expert(entry.get())
+        expert_list.config(state=NORMAL)
+        expert_list.insert("end", "● " + entry.get() + "\n")
+        expert_list.config(state=DISABLED)
 
         root.withdraw()
         new_expert_window = Toplevel()
@@ -374,11 +402,11 @@ def add_expert(entry):
     entry.insert(0, "Unknown Expert " + str(expert_no))
 
 
-add_expert_label = Label(main_window, text="Enter the expert name", font=LABEL_FONT)
+add_expert_label = Label(main_window, text="Enter new expert name", font=LABEL_FONT)
 add_expert_label.grid(row=row_no, column=column_no)
 add_expert_entry = Entry(main_window, width=20, font=FONT)
 add_expert_entry.insert(0, "Unknown Expert 0")
-add_expert_entry.grid(row=row_no + 1, column=column_no, padx=10, pady=5)
+add_expert_entry.grid(row=row_no + 1, column=column_no, padx=15, pady=5)
 add_expert_button = Button(main_window, text="Add new expert", font=FONT,
                            command=lambda: add_expert(add_expert_entry))
 add_expert_button.grid(row=row_no + 2, column=column_no, padx=50)
@@ -480,7 +508,7 @@ def preview():
         for i in range(len(categories)):
             for expert, category in missing_data:
                 if expert == expert_chosen:
-                    print(expert, category)
+                    # print(expert, category)
                     if categories[i] in category:
                         categories_listbox.itemconfig(i, {'bg': 'red'})
                     else:
@@ -528,25 +556,25 @@ def preview():
                 for widget in preview_frame.winfo_children():
                     if isinstance(widget, Entry):
                         values.append(widget.get())
-                        print(widget.get())
+                        # print(widget.get())
 
                 mod = len(db.countries)
                 values = values[mod*2:]
                 for v in values:
                     if not isfloat(v) or float(v) <= 0 or float(v) > 9:
-                        print(not isfloat(v))
+                        # print(not isfloat(v))
                         # print(float(values[v]))
-                        print(v)
+                        # print(v)
 
                         showinfo(title='Invalid data!',
-                                 message="Values need to be float type in range <0,9]")
+                                 message="Values need to be float type in range [1/9,9]")
                         return
 
 
                 true_category = category_chosen
                 if subcategories_chosen != NO_SUBCATEGORY:
                     true_category = subcategories_chosen
-                print(values)
+                # print(values)
                 for v in range(len(values)):
                     if v // mod < v % mod:
                         db.set_matrix_field(true_category, expert_chosen, v // mod, v % mod, float(values[v]))
@@ -700,7 +728,7 @@ preview_button.grid(column=column_no, row=0, rowspan=row_no, pady=10, padx=10)
 
 def solve():
     if db.is_missing_data():
-        print(db.is_missing_data())
+        # print(db.is_missing_data())
         showinfo(title='Missing data', message="First you need fill all the necessary opinions!\n"
                                                "You can do it in \"Show experts' opinions\" section.")
     else:
@@ -709,7 +737,7 @@ def solve():
 
         results = Toplevel()
         results.title("Ranking")
-        results.geometry("1600x800")
+        results.geometry("1600x900")
         # "1024x576"
         results.resizable(False, False)
 
