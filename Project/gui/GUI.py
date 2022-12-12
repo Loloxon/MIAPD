@@ -10,6 +10,7 @@ from Project.resources.DataBase import DataBase
 FONT = ("Arial", 20)
 LABEL_FONT = ("Arial", 15)
 NO_SUBCATEGORY = "<no subcategory>"
+NO_CATEGORY = "<no category>"
 
 root = Tk()
 root.title("Comparing App")
@@ -426,10 +427,13 @@ def preview():
     preview_window.resizable(False, False)
 
     frame = Frame(preview_window, bg="light grey", pady=10, padx=10)
-    frame.grid(row=0, column=0, padx=15, pady=15)
+    frame.grid(row=0, column=0, rowspan=2, padx=15, pady=15)
 
-    preview_frame = Frame(preview_window, bg="light grey", pady=10, padx=10)
-    preview_frame.grid(row=0, column=1, padx=5, pady=5)
+    preview_frame_bottom = Frame(preview_window, bg="light grey", padx=10)
+    preview_frame_bottom.grid(row=1, column=1, padx=5, pady=5)
+
+    preview_frame_top = Frame(preview_window, bg="light grey", padx=10)
+    preview_frame_top.grid(row=0, column=1, padx=5, pady=5)
 
     missing_data = db.is_missing_data()
 
@@ -438,6 +442,7 @@ def preview():
     experts_listbox.grid(row=0, column=0, padx=10, pady=10)
 
     categories = db.categories
+    categories.insert(0, NO_CATEGORY)
     categories_listbox = Listbox(frame, listvariable=Variable(value=categories), height=len(categories))
     categories_listbox.grid(row=0, column=1, padx=10, pady=10)
 
@@ -488,10 +493,12 @@ def preview():
             category_chosen = categories_listbox.get(selected_indices[0])
 
             subcategories_listbox.delete(0, "end")
-            if subcategories[selected_indices[0]] == "":
+            if selected_indices[0] == 0:
+                subcategories_listbox.insert("end", NO_SUBCATEGORY)
+            elif subcategories[selected_indices[0]-1] == "":
                 subcategories_listbox.insert("end", category_chosen)
             else:
-                for sub in subcategories[selected_indices[0]]:
+                for sub in subcategories[selected_indices[0]-1]:
                     subcategories_listbox.insert("end", sub)
 
         selected_indices = subcategories_listbox.curselection()
@@ -532,33 +539,44 @@ def preview():
             showinfo(title='Missing data', message="First you need to choice all the options from lists!")
         else:
             nonlocal expert_chosen, category_chosen, subcategories_chosen
-            # weight_name_entry = Entry(preview_frame, fg='blue', font=('Arial', 16, 'bold'), width=10)
+            # weight_name_entry = Entry(preview_frame_bottom, fg='blue', font=('Arial', 16, 'bold'), width=10)
             # weight_name_entry.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
             # weight_name_entry.insert("end", "Weight of the " + str(subcategories_chosen) + ": ")
             # weight_name_entry.config(state=DISABLED)
-            # weight_entry = Entry(preview_frame, fg='blue', font=('Arial', 16, 'bold'), width=10)
+            # weight_entry = Entry(preview_frame_bottom, fg='blue', font=('Arial', 16, 'bold'), width=10)
             # weight_entry.grid(row=0, column=1, columnspan=3, padx=10, pady=10)
             # weight_name_entry.insert("end", "5")
-            for widget in preview_frame.winfo_children():
+            for widget in preview_frame_bottom.winfo_children():
                 widget.destroy()
 
             key = subcategories_chosen
             labels = db.countries
-            if subcategories_chosen == NO_SUBCATEGORY:
-                key = category_chosen
-                if len(db.subcategories_map.get(category_chosen)) > 0:
-                    labels = list(db.subcategories_map.get(category_chosen))
+            name = "Preview for " + str(expert_chosen) + ": "
+            # "Preview for " + str(expert_chosen) + ": " + str(key) + ", " + str()
+            if category_chosen == NO_CATEGORY:
+                key = "categories"
+                labels = db.categories
+                name += "categories weights"
+            else:
+                if subcategories_chosen == NO_SUBCATEGORY:
+                    key = category_chosen
+                    name += str(category_chosen)
+                    if len(db.subcategories_map.get(category_chosen)) > 0:
+                        labels = list(db.subcategories_map.get(category_chosen))
+                        name += " weights"
+                else:
+                    name += str(subcategories_chosen) + " (" + str(category_chosen) + ")"
             matrix = db.get_matrix(key, expert_chosen)
-            Table(preview_frame, matrix, labels)
+            Table(preview_frame_bottom, matrix, labels, preview_frame_top, name)
 
             def save():
                 values = []
-                for widget in preview_frame.winfo_children():
+                for widget in preview_frame_bottom.winfo_children():
                     if isinstance(widget, Entry):
                         values.append(widget.get())
                         # print(widget.get())
 
-                mod = len(db.countries)
+                mod = len(labels)
                 values = values[mod*2:]
                 for v in values:
                     if not isfloat(v) or float(v) <= 0 or float(v) > 9:
@@ -574,18 +592,20 @@ def preview():
                 true_category = category_chosen
                 if subcategories_chosen != NO_SUBCATEGORY:
                     true_category = subcategories_chosen
+                if true_category == NO_CATEGORY:
+                    true_category = "categories"
                 # print(values)
                 for v in range(len(values)):
                     if v // mod < v % mod:
                         db.set_matrix_field(true_category, expert_chosen, v // mod, v % mod, float(values[v]))
 
                 # TODO zapisywanie zmian
-                for widget in preview_frame.winfo_children():
+                for widget in preview_frame_bottom.winfo_children():
                     widget.destroy()
                 pass
 
-            save_button = Button(preview_frame, text="Save", font=FONT, command=save)
-            save_button.grid(row=len(labels) + 1, columnspan=len(labels) + 1, pady=10, padx=10)
+            save_button = Button(preview_frame_bottom, text="Save", font=FONT, command=save, width=10)
+            save_button.grid(row=len(labels) + 1, columnspan=len(labels) + 1,  pady=10, padx=10)
 
     def add_opinion():
         nonlocal expert_chosen, category_chosen, subcategories_chosen
@@ -603,7 +623,7 @@ def preview():
             showinfo(title='All opinions given', message="No need to add more opinions as all of them have been "
                                                          "already given.")
         else:
-            for widget in preview_frame.winfo_children():
+            for widget in preview_frame_bottom.winfo_children():
                 widget.destroy()
 
             names = db.countries
@@ -621,17 +641,17 @@ def preview():
                 label = "Comparison " + expert_chosen + " for " + subcategories_chosen + " from " + category_chosen
 
             idx = 0
-            e_label = Entry(preview_frame, fg='black', font=FONT, width=50, justify=CENTER)
+            e_label = Entry(preview_frame_bottom, fg='black', font=FONT, width=50, justify=CENTER)
             e_label.grid(row=0, column=0, columnspan=4)
             e_label.config(state=DISABLED)
-            e1 = Entry(preview_frame, fg='black', font=FONT, width=20, justify=CENTER)
+            e1 = Entry(preview_frame_bottom, fg='black', font=FONT, width=20, justify=CENTER)
             e1.grid(row=1, column=0)
             e1.config(state=DISABLED)
-            s1 = Scale(preview_frame, from_=9, to=1, width=25)
+            s1 = Scale(preview_frame_bottom, from_=9, to=1, width=25)
             s1.grid(row=1, column=1, padx=5)
-            s2 = Scale(preview_frame, from_=9, to=1, width=25)
+            s2 = Scale(preview_frame_bottom, from_=9, to=1, width=25)
             s2.grid(row=1, column=2, padx=5)
-            e2 = Entry(preview_frame, fg='black', font=FONT, width=20, justify=CENTER)
+            e2 = Entry(preview_frame_bottom, fg='black', font=FONT, width=20, justify=CENTER)
             e2.grid(row=1, column=3)
             e2.config(state=DISABLED)
 
@@ -694,16 +714,16 @@ def preview():
             # TODO dodawanie do database
             _next()
 
-            next_button = Button(preview_frame, text="Next", font=FONT, command=_next)
+            next_button = Button(preview_frame_bottom, text="Next", font=FONT, command=_next)
             next_button.grid(row=2, column=0, columnspan=2, pady=10, padx=10)
 
             def save():
                 # TODO zapisywanie zmian
-                for widget in preview_frame.winfo_children():
+                for widget in preview_frame_bottom.winfo_children():
                     widget.destroy()
                 pass
 
-            save_button = Button(preview_frame, text="Save", font=FONT, command=save)
+            save_button = Button(preview_frame_bottom, text="Save", font=FONT, command=save)
             save_button.grid(row=2, column=2, columnspan=2, pady=10, padx=10)
 
     matrix_button = Button(frame, text="Show matrix", font=FONT, command=show_matrix)
