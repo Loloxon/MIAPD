@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 
@@ -47,12 +47,15 @@ class AHP:
         country_ranking = [country for _, country in sorted(zip(weights, countries), reverse=True)]
         return country_ranking, sorted(weights, reverse=True)
 
-    def get_inconstistency_index(self, matrix: np.array) -> float:
-        # TODO check if it is correct
-        n = matrix.shape[0]
-        eigenvalues, _ = np.linalg.eig(matrix)
-        max_eigenvalue = np.max(eigenvalues)
-        return (max_eigenvalue - n) / (n - 1)
+    def get_inconsistency_index(self, matrix: str, expert: Union[int, str]) -> float:
+        matrix = self._db.get_matrix(matrix, expert)
+
+        # TODO check calculating inconsistency_index
+        eigenvalues, eigenvectors = np.linalg.eig(matrix)
+        max_eigenvalue = max(eigenvalues)
+        index = (max_eigenvalue - matrix.shape[0]) / (matrix.shape[0] - 1)
+        return index
+
 
 
 
