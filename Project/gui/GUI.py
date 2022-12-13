@@ -5,6 +5,26 @@ from tkinter.scrolledtext import ScrolledText
 from Project.backend.AHP import AHP
 from Project.gui.Table import Table
 
+column_no = 0
+row_no = 1
+country_no = 0
+
+country_list = ScrolledText(main_window, font=FONT, width=20, height=18)
+for country in db.countries:
+    country_list.insert("end", "● " + country + "\n")
+country_list.config(state=DISABLED)
+country_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
+
+
+def add_country(entry):
+    global country_no
+    if entry.get() in db.countries:
+        showinfo(title='Invalid name!', message="Given country already exists in the database!")
+    else:
+        db.add_country(entry.get())
+        country_list.config(state=NORMAL)
+        country_list.insert("end", "● " + entry.get() + "\n")
+
 
 class GUI:
     def __init__(self, data_base):
