@@ -48,8 +48,10 @@ class AHP:
         country_ranking = [country for _, country in sorted(zip(weights, countries), reverse=True)]
         return country_ranking, sorted(weights, reverse=True)
 
-    def get_inconsistency_index(self, matrix: str, expert: Union[int, str]) -> float:
+    def get_inconsistency_index(self, matrix: str, expert: Union[int, str]) -> Union[float, str]:
         matrix = self._db.get_matrix(matrix, expert)
+        if any(0 in sublist for sublist in matrix):
+            return "missing values!"
         index = 0
 
         for i, j, k in combinations(range(matrix.shape[0]), 3):

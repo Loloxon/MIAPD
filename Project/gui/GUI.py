@@ -165,12 +165,6 @@ def init(db):
 init(db)
 ahp = AHP(db)
 
-# print(db.matrices)
-# ahp = AHP(db)
-# rank = ahp.calculate_ranking()
-# print(db.subcategories_map)
-# print(rank)
-
 #####################################           COUNTRY           #####################################
 
 column_no = 0
@@ -569,8 +563,10 @@ def preview():
                 else:
                     name += str(subcategories_chosen) + " (" + str(category_chosen) + ")"
             matrix = db.get_matrix(key, expert_chosen)
-            index_sth = ahp.get_inconsistency_index(key, expert_chosen)
-            name += "\nInconsistency Index: " + str(round(index_sth, 5))
+            inconsistency_index = ahp.get_inconsistency_index(key, expert_chosen)
+            if not isinstance(inconsistency_index, str):
+                inconsistency_index = str(round(inconsistency_index, 5))
+            name += "\nInconsistency Index: " + inconsistency_index
             Table(preview_frame_bottom, matrix, labels, preview_frame_top, name)
 
             def save():
