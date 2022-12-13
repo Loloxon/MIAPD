@@ -39,10 +39,10 @@ def init(db):
     db.add_country('Germany')
     db.add_country('Japan')
 
-    db.add_category('Army')
-    db.add_subcategory('Army', 'Navy')
-    db.add_subcategory('Army', 'Ground Forces')
-    db.add_subcategory('Army', 'Air Forces')
+    db.add_category('Army(')
+    db.add_subcategory('Army(', 'Navy')
+    db.add_subcategory('Army(', 'Ground Forces')
+    db.add_subcategory('Army(', 'Air Forces')
     db.add_category('Distance')
     db.add_category('Potential Allies')
     db.add_category('Economy')
@@ -53,7 +53,7 @@ def init(db):
     array = np.array([[1, 7, 8],
                       [1 / 7, 1, 3],
                       [1 / 8, 1 / 3, 1]])
-    matrix = "Army"
+    matrix = "Army("
     expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
@@ -164,6 +164,12 @@ def init(db):
 
 init(db)
 ahp = AHP(db)
+
+# print(db.matrices)
+# ahp = AHP(db)
+# rank = ahp.calculate_ranking()
+# print(db.subcategories_map)
+# print(rank)
 
 #####################################           COUNTRY           #####################################
 
@@ -564,7 +570,7 @@ def preview():
                     name += str(subcategories_chosen) + " (" + str(category_chosen) + ")"
             matrix = db.get_matrix(key, expert_chosen)
             index_sth = ahp.get_inconsistency_index(key, expert_chosen)
-            name += "\nIndeks niespójności macierzy: " + str(round(index_sth, 5))
+            name += "\nInconsistency Index: " + str(round(index_sth, 5))
             Table(preview_frame_bottom, matrix, labels, preview_frame_top, name)
 
             def save():
