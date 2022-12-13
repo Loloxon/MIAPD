@@ -320,8 +320,15 @@ class GUI:
                         experts_listbox.itemconfig(i, {'bg': 'red'})
             for i in range(len(categories)):
                 for expert, category in missing_data:
-                    if expert == missing_data[0][0] and categories[i] in category:
-                        categories_listbox.itemconfig(i, {'bg': 'red'})
+                    if expert == missing_data[0][0]:
+                        print(self.db.subcategories_map.get(categories[i]))
+                        print(category)
+                        if self.db.subcategories_map.get(categories[i]) is not None:
+                            for subcategory in self.db.subcategories_map.get(categories[i]):
+                                if subcategory in category:
+                                    categories_listbox.itemconfig(i, {'bg': 'red'})
+                        if categories[i] in category:
+                            categories_listbox.itemconfig(i, {'bg': 'red'})
             # for i in range(len(subcategories[0])):
             #     for expert, subcategory in missing_data:
             #         if expert == missing_data[0][0] and categories[i] in subcategory:
@@ -373,13 +380,22 @@ class GUI:
                     for expert, _ in missing_data:
                         if experts[i] == expert_chosen:
                             experts_listbox.itemconfig(i, {'bg': 'red'})
+
+                for i in range(categories_listbox.size()):
+                    categories_listbox.itemconfig(i, {'bg': 'white'})
                 for i in range(len(categories)):
                     for expert, category in missing_data:
-                        if expert == expert_chosen:
+                        if expert == missing_data[0][0]:
+                            print(self.db.subcategories_map.get(categories[i]))
+                            print(category)
+                            if self.db.subcategories_map.get(categories[i]) is not None:
+                                for subcategory in self.db.subcategories_map.get(categories[i]):
+                                    if subcategory in category:
+                                        categories_listbox.itemconfig(i, {'bg': 'red'})
                             if categories[i] in category:
                                 categories_listbox.itemconfig(i, {'bg': 'red'})
-                            else:
-                                categories_listbox.itemconfig(i, {'bg': 'white'})
+
+
 
                 selected_experts.config(text=expert_chosen)
                 selected_categories.config(text=category_chosen)
