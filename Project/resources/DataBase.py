@@ -1,6 +1,10 @@
+from __future__ import annotations
+
+import pickle
 from copy import deepcopy
 from typing import Dict, List, Union, Tuple
 import numpy as np
+
 
 # Kolejność robienia rzeczy
 # 1. Załadowanie nazw kategorii, krajów i ekspertów z pliku
@@ -138,6 +142,15 @@ class DataBase:
             if missing_for_expert:
                 missing_matrices.append((self._experts[i], missing_for_expert))
         return missing_matrices
+
+    def save(self, path: str = 'DataBase.pkl') -> None:
+        with open(path, 'wb') as f:
+            pickle.dump(self, f)
+
+    @classmethod
+    def load(cls, path: str = 'DataBase.pkl') -> DataBase:
+        with open(path, 'rb') as f:
+            return pickle.load(f)
 
     @property
     def matrices(self) -> Dict[str, List[np.array]]:
