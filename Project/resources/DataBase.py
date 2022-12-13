@@ -18,7 +18,7 @@ class DataBase:
         self._experts = []
         self._countries = []
         self._categories = []
-        self.generate_matrices()
+        self._generate_matrices()
 
     def add_expert(self, name: str) -> None:
         self._experts.append(name)
@@ -36,7 +36,7 @@ class DataBase:
                     for i, matrix in enumerate(self._matrices[subcategory]):
                         self._matrices[subcategory][i] = add_row_col(matrix)
 
-    def generate_matrices(self) -> None:
+    def _generate_matrices(self) -> None:
         new_matrices = dict()
         for k, v in self._subcategories_map.items():
             if not v:
