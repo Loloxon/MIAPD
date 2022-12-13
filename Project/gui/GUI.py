@@ -9,21 +9,6 @@ column_no = 0
 row_no = 1
 country_no = 0
 
-country_list = ScrolledText(main_window, font=FONT, width=20, height=18)
-for country in db.countries:
-    country_list.insert("end", "● " + country + "\n")
-country_list.config(state=DISABLED)
-country_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
-
-
-def add_country(entry):
-    global country_no
-    if entry.get() in db.countries:
-        showinfo(title='Invalid name!', message="Given country already exists in the database!")
-    else:
-        db.add_country(entry.get())
-        country_list.config(state=NORMAL)
-        country_list.insert("end", "● " + entry.get() + "\n")
 
 
 class GUI:
@@ -626,12 +611,14 @@ class GUI:
                 ranking = []
                 for i in range(len(rank[0])):
                     ranking.append((rank[0][i], rank[1][i]))
-
+                # TODO dodać suwaczek
+                for i in range(10):
+                    ranking.append(("country" + (str(i)), 0.2))
                 # TODO ewentualnie jakieś bajery do wyświetlania
                 top = ranking[0][1]
                 multi = 100 / top
                 label_tmp = Label(frame, text="Which country is best\nto declare war on?", font=("Arial", 50, "bold"))
-                label_tmp.grid(sticky=S, pady=10, padx=10)
+                label_tmp.grid(column=0, sticky=S, pady=10, padx=10)
                 # labels.append(label_tmp)
                 for idx, country in enumerate(ranking):
                     if idx == 0:
@@ -646,8 +633,16 @@ class GUI:
                     else:
                         label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
                                           font=("Arial", round(country[1] * multi)))
-                    label_tmp.grid(sticky=S, pady=10, padx=10)
+                    label_tmp.grid(column=0, sticky=S, pady=10, padx=10)
                     # labels.append(label_tmp)
+
+
+                # scrollbar = Scrollbar(frame, orient='vertical')
+                # scrollbar.grid(row=0, column=1, sticky=NS)
+
+                scrollderoot = Scrollbar(orient="vertical", command=frame.yview)
+                scrollderoot.grid(column=1, row=0, sticky='ns', in_=frame)
+                root.configure(yscrollcommand=scrollderoot.set)
 
         buttonSolve = Button(root, text="Solve", font=("Arial", 26), command=solve, bg="blue", fg="pink",
                              width=40)
