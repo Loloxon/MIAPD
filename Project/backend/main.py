@@ -4,7 +4,7 @@ from Project.gui.GUI import GUI
 from Project.resources.DataBase import DataBase
 
 
-def init_data_base(db):
+def init_data_base():
     db.add_expert('Bob, The Expert')
     db.add_country('USA')
     db.add_country('Russia')
@@ -136,5 +136,5 @@ def init_data_base(db):
 
 if __name__ == '__main__':
     db = DataBase()
-    init_data_base(db)
+    init_data_base()
     gui = GUI(db)

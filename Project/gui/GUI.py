@@ -5,11 +5,6 @@ from tkinter.scrolledtext import ScrolledText
 from Project.backend.AHP import AHP
 from Project.gui.Table import Table
 
-column_no = 0
-row_no = 1
-country_no = 0
-
-
 
 class GUI:
     def __init__(self, data_base):
@@ -129,10 +124,6 @@ class GUI:
 
                 frame = Frame(new_expert_window, bg="light grey", pady=10, padx=10)
                 frame.grid(row=0, column=0, padx=5, pady=5)
-
-                # key = subcategories_chosen
-                all_labels = []
-                # labels = list(db.countries_map.keys())
 
                 countries = self.db.countries
                 sub = []
@@ -314,25 +305,46 @@ class GUI:
                                             height=len(subcategories[0]))
             subcategories_listbox.grid(row=0, column=2, padx=10, pady=10)
 
-            for i in range(len(experts)):
+            expert_chosen = experts[0]
+
+            # for i in range(len(experts)):
+            for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
+                print(i)
+                coloring = False
                 for expert, _ in missing_data:
-                    if experts[i] == expert:
-                        experts_listbox.itemconfig(i, {'bg': 'red'})
-            for i in range(len(categories)):
+                    if expert_listbox == expert:
+                        coloring = True
+                if coloring:
+                    experts_listbox.itemconfig(i, {'bg': 'red'})
+                else:
+                    experts_listbox.itemconfig(i, {'bg': 'white'})
+
+            # for i in range(len(categories)):
+            for i, category_listbox in enumerate(categories_listbox.get(0, END)):
+                coloring = False
                 for expert, category in missing_data:
-                    if expert == missing_data[0][0]:
-                        print(self.db.subcategories_map.get(categories[i]))
-                        print(category)
-                        if self.db.subcategories_map.get(categories[i]) is not None:
-                            for subcategory in self.db.subcategories_map.get(categories[i]):
+                    if expert == expert_chosen:
+                        if self.db.subcategories_map.get(category_listbox) is not None:
+                            for subcategory in self.db.subcategories_map.get(category_listbox):
                                 if subcategory in category:
-                                    categories_listbox.itemconfig(i, {'bg': 'red'})
-                        if categories[i] in category:
-                            categories_listbox.itemconfig(i, {'bg': 'red'})
+                                    coloring = True
+                        if category_listbox in category:
+                            coloring = True
+                if coloring:
+                    categories_listbox.itemconfig(i, {'bg': 'red'})
+                else:
+                    categories_listbox.itemconfig(i, {'bg': 'white'})
+
             # for i in range(len(subcategories[0])):
-            #     for expert, subcategory in missing_data:
-            #         if expert == missing_data[0][0] and categories[i] in subcategory:
-            #             categories_listbox.itemconfig(i, {'bg': 'red'})
+            for i, subcategory_listbox in enumerate(subcategories_listbox.get(0, END)):
+                coloring = False
+                for expert, subcategory in missing_data:
+                    if expert == expert_chosen and subcategory_listbox in subcategory:
+                        coloring = True
+                if coloring:
+                    subcategories_listbox.itemconfig(i, {'bg': 'red'})
+                else:
+                    subcategories_listbox.itemconfig(i, {'bg': 'white'})
 
             selected_experts = Label(frame, width=20, font=self.FONT)
             selected_experts.grid(row=2, column=0, columnspan=3, padx=10, pady=1)
@@ -376,26 +388,46 @@ class GUI:
                 if expert_chosen != "" and category_chosen != "" and subcategories_chosen != "":
                     chosen_options = True
 
-                for i in range(len(experts)):
+                print(missing_data)
+
+                # for i in range(len(experts)):
+                for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
+                    print(i)
+                    coloring = False
                     for expert, _ in missing_data:
-                        if experts[i] == expert_chosen:
-                            experts_listbox.itemconfig(i, {'bg': 'red'})
+                        if expert_listbox == expert:
+                            coloring = True
+                    if coloring:
+                        experts_listbox.itemconfig(i, {'bg': 'red'})
+                    else:
+                        experts_listbox.itemconfig(i, {'bg': 'white'})
 
-                for i in range(categories_listbox.size()):
-                    categories_listbox.itemconfig(i, {'bg': 'white'})
-                for i in range(len(categories)):
+                # for i in range(len(categories)):
+                for i, category_listbox in enumerate(categories_listbox.get(0, END)):
+                    coloring = False
                     for expert, category in missing_data:
-                        if expert == missing_data[0][0]:
-                            print(self.db.subcategories_map.get(categories[i]))
-                            print(category)
-                            if self.db.subcategories_map.get(categories[i]) is not None:
-                                for subcategory in self.db.subcategories_map.get(categories[i]):
+                        if expert == expert_chosen:
+                            if self.db.subcategories_map.get(category_listbox) is not None:
+                                for subcategory in self.db.subcategories_map.get(category_listbox):
                                     if subcategory in category:
-                                        categories_listbox.itemconfig(i, {'bg': 'red'})
-                            if categories[i] in category:
-                                categories_listbox.itemconfig(i, {'bg': 'red'})
+                                        coloring = True
+                            if category_listbox in category:
+                                coloring = True
+                    if coloring:
+                        categories_listbox.itemconfig(i, {'bg': 'red'})
+                    else:
+                        categories_listbox.itemconfig(i, {'bg': 'white'})
 
-
+                # for i in range(len(subcategories[0])):
+                for i, subcategory_listbox in enumerate(subcategories_listbox.get(0, END)):
+                    coloring = False
+                    for expert, subcategory in missing_data:
+                        if expert == expert_chosen and subcategory_listbox in subcategory:
+                            coloring = True
+                    if coloring:
+                        subcategories_listbox.itemconfig(i, {'bg': 'red'})
+                    else:
+                        subcategories_listbox.itemconfig(i, {'bg': 'white'})
 
                 selected_experts.config(text=expert_chosen)
                 selected_categories.config(text=category_chosen)
@@ -611,54 +643,59 @@ class GUI:
                 showinfo(title='Missing data', message="First you need fill all the necessary opinions!\n"
                                                        "You can do it in \"Show experts' opinions\" section.")
             else:
-                # label = Label(main_window, text="Clicked")
-                # label.grid(sticky=S, columnspan=5, pady=10, padx=10)
-
                 results = Toplevel()
                 results.title("Ranking")
-                results.geometry("1600x900")  # "1024x576"
+                results.geometry("1170x900")  # "1024x576"
                 results.resizable(False, False)
 
-                frame = Frame(results, bg="light grey", pady=10, padx=10)
-                frame.grid(sticky=SE, padx=5, pady=5)
+                canvas = Canvas(results)
+                scrollbar = Scrollbar(results, orient="vertical", command=canvas.yview, width=20)
+                scrollable_frame = Frame(canvas, padx=30, pady=30)
+                scrollable_frame.bind(
+                    "<Configure>",
+                    lambda e: canvas.configure(
+                        scrollregion=canvas.bbox("all")
+                    )
+                )
+                scrollable_frame.pack(side="right", fill="both")
+                canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+                canvas.configure(yscrollcommand=scrollbar.set)
+
+                scrollbar.pack(side="right", fill="y")
+                canvas.pack(side="right", fill="both", expand=True)
 
                 rank = self.ahp.calculate_ranking()
 
                 ranking = []
                 for i in range(len(rank[0])):
                     ranking.append((rank[0][i], rank[1][i]))
-                # TODO dodać suwaczek
-                for i in range(10):
-                    ranking.append(("country" + (str(i)), 0.2))
                 # TODO ewentualnie jakieś bajery do wyświetlania
                 top = ranking[0][1]
                 multi = 100 / top
-                label_tmp = Label(frame, text="Which country is best\nto declare war on?", font=("Arial", 50, "bold"))
+                label_tmp = Label(scrollable_frame, text="Which country is best\nto declare war on?",
+                                  font=("Arial", 50, "bold"))
                 label_tmp.grid(column=0, sticky=S, pady=10, padx=10)
                 # labels.append(label_tmp)
                 for idx, country in enumerate(ranking):
                     if idx == 0:
-                        label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), fg="#F00")
+                        label_tmp = Label(scrollable_frame,
+                                          text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                          font=("Arial", round(country[1] * multi)), fg="#F00", justify=RIGHT, bg="#AAA")
                     elif idx == 1:
-                        label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), fg="#A00")
+                        label_tmp = Label(scrollable_frame,
+                                          text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                          font=("Arial", round(country[1] * multi)), fg="#A00", justify=RIGHT, bg="#AAA")
                     elif idx == 2:
-                        label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), fg="#500")
+                        label_tmp = Label(scrollable_frame,
+                                          text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                          font=("Arial", round(country[1] * multi)), fg="#500", justify=RIGHT, bg="#AAA")
                     else:
-                        label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)))
-                    label_tmp.grid(column=0, sticky=S, pady=10, padx=10)
+                        label_tmp = Label(scrollable_frame,
+                                          text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                          font=("Arial", round(country[1] * multi)), justify=RIGHT, bg="#AAA")
+                    label_tmp.grid(sticky=S, pady=10, padx=10)
+                    label_tmp.config(justify=RIGHT)
                     # labels.append(label_tmp)
-
-
-                # scrollbar = Scrollbar(frame, orient='vertical')
-                # scrollbar.grid(row=0, column=1, sticky=NS)
-
-                scrollderoot = Scrollbar(orient="vertical", command=frame.yview)
-                scrollderoot.grid(column=1, row=0, sticky='ns', in_=frame)
-                root.configure(yscrollcommand=scrollderoot.set)
 
         buttonSolve = Button(root, text="Solve", font=("Arial", 26), command=solve, bg="blue", fg="pink",
                              width=40)
