@@ -174,11 +174,13 @@ column_no = 0
 row_no = 1
 country_no = 0
 
-country_list = Text(main_window, font=FONT, width=20)
+country_list = Text(main_window, font=FONT, width=20, height=18)
 for country in db.countries:
     country_list.insert("end", "● " + country + "\n")
 country_list.config(state=DISABLED)
-country_list.grid(row=row_no + 3, column=column_no, padx=15, pady=5)
+country_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
+
+
 def add_country(entry):
     global country_no
     if entry.get() in db.countries:
@@ -209,13 +211,15 @@ column_no = 1
 row_no = 1
 category_no = 0
 
-category_list = Text(main_window, font=FONT, width=20)
+category_list = Text(main_window, font=FONT, width=20, height=18)
 for category in db.categories:
     category_list.insert("end", "● " + category + "\n")
     for subcategory in db.subcategories_map.get(category):
         category_list.insert("end", "   - " + subcategory + "\n")
 category_list.config(state=DISABLED)
-category_list.grid(row=row_no + 3, column=column_no, padx=15, pady=5)
+category_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
+
+
 def add_category(entry):
     global category_no
     if entry.get() in db.categories:
@@ -249,11 +253,13 @@ column_no = 2
 row_no = 1
 expert_no = 0
 
-expert_list = Text(main_window, font=FONT, width=20)
+expert_list = Text(main_window, font=FONT, width=20, height=18)
 for category in db.experts:
     expert_list.insert("end", "● " + category + "\n")
 expert_list.config(state=DISABLED)
-expert_list.grid(row=row_no + 3, column=column_no, padx=15, pady=5)
+expert_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
+
+
 def add_expert(entry):
     global expert_no
     if entry.get() in db.experts:
@@ -291,21 +297,25 @@ def add_expert(entry):
                 sub.append([category])
                 # porownuje kraje
 
-        labels = []
-        names = []
+        labels = ["categories"]
+        names = [db.categories]
+        categories = ["categories"]
         for s in sub:
             if len(s) == 2:
                 if s[0] != s[1]:
                     labels.append("Comparison for " + str(s[1]) + " from " + str(s[0]))
                     names.append(countries)
+                    categories.append(str(s[1]))
                     # #dla s[0] _ s[1]
                 else:
                     labels.append("Comparison for weights within " + str(s[0]))
                     names.append(db.subcategories_map.get(s[0]))
+                    categories.append(str(s[0]))
                     # #dla s[0] wagi podkategorii
             else:
                 labels.append("Comparison for " + str(s[0]))
                 names.append(countries)
+                categories.append(str(s[0]))
                 # # dla s[0]
 
         idx = 0
@@ -327,39 +337,39 @@ def add_expert(entry):
         previous_idx2 = -1
 
         expert_chosen = "idk"
-        category_chosen = "idk"
-        subcategories_chosen = "idk"
+        true_category = "idk"
 
         def _next():
             nonlocal idx, names, labels, e_label, e1, e2, s1, s2, previous_idx1, previous_idx2, expert_chosen, \
-                category_chosen, subcategories_chosen
+                true_category
             finishing = True
             _break = False
 
             if idx > 0:
-                # print(previous_idx1, "to", previous_idx2, s1.get() / s2.get(), "for", expert_chosen,
-                #       category_chosen, subcategories_chosen)
-
-                true_category = category_chosen
-                if subcategories_chosen != NO_SUBCATEGORY:
-                    true_category = subcategories_chosen
-                # print(true_category, expert_chosen, previous_idx1, previous_idx2, s1.get() / s2.get())
                 db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1, s1.get() / s2.get())
 
             idx_copy = idx
-            for idx1 in range(len(names)):
-                for idx2 in range(idx1 + 1, len(names)):
-                    if idx_copy == 0:
-                        idx += 1
-                        finishing = False
-                        current_name1 = names[idx1]
-                        current_name2 = names[idx2]
-                        previous_idx1 = idx1
-                        previous_idx2 = idx2
-                        _break = True
+            for index, label in enumerate(labels):
+                for idx1 in range(len(names[index])):
+                    for idx2 in range(idx1 + 1, len(names[index])):
+                        if idx_copy == 0:
+                            idx += 1
+                            finishing = False
+                            current_name1 = names[index][idx1]
+                            current_name2 = names[index][idx2]
+                            current_label = label
+
+                            expert_chosen = entry.get()
+                            true_category = categories[index]
+
+                            previous_idx1 = idx1
+                            previous_idx2 = idx2
+                            _break = True
+                        if _break:
+                            break
+                        idx_copy -= 1
                     if _break:
                         break
-                    idx_copy -= 1
                 if _break:
                     break
 
@@ -370,7 +380,7 @@ def add_expert(entry):
             else:
                 e_label.config(state=NORMAL)
                 e_label.delete(0, "end")
-                e_label.insert(0, labels)
+                e_label.insert(0, current_label)
                 e_label.config(state=DISABLED)
 
                 e1.config(state=NORMAL)
@@ -386,10 +396,13 @@ def add_expert(entry):
         # TODO dodawanie do database
         _next()
 
-        next_button = Button(frame, text="Next", font=FONT, command=next)
+        next_button = Button(frame, text="Next", font=FONT, command=_next)
         next_button.grid(row=2, column=0, columnspan=2, pady=10, padx=10)
 
         def save():
+            if idx > 0:
+                db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1, s1.get() / s2.get())
+
             # TODO zapisywanie zmian
             root.deiconify()
             new_expert_window.destroy()
@@ -495,10 +508,10 @@ def preview():
             subcategories_listbox.delete(0, "end")
             if selected_indices[0] == 0:
                 subcategories_listbox.insert("end", NO_SUBCATEGORY)
-            elif subcategories[selected_indices[0]-1] == "":
+            elif subcategories[selected_indices[0] - 1] == "":
                 subcategories_listbox.insert("end", category_chosen)
             else:
-                for sub in subcategories[selected_indices[0]-1]:
+                for sub in subcategories[selected_indices[0] - 1]:
                     subcategories_listbox.insert("end", sub)
 
         selected_indices = subcategories_listbox.curselection()
@@ -515,16 +528,10 @@ def preview():
         for i in range(len(categories)):
             for expert, category in missing_data:
                 if expert == expert_chosen:
-                    # print(expert, category)
                     if categories[i] in category:
                         categories_listbox.itemconfig(i, {'bg': 'red'})
                     else:
                         categories_listbox.itemconfig(i, {'bg': 'white'})
-
-        # for i in range(len(subcategories[category_chosen_no])):
-        #     for expert, subcategory in missing_data:
-        #         if expert == expert_chosen and subcategories[category_chosen_no][i] in subcategory:
-        #             subcategories_listbox.itemconfig(i, {'bg': 'red'})
 
         selected_experts.config(text=expert_chosen)
         selected_categories.config(text=category_chosen)
@@ -539,24 +546,16 @@ def preview():
             showinfo(title='Missing data', message="First you need to choice all the options from lists!")
         else:
             nonlocal expert_chosen, category_chosen, subcategories_chosen
-            # weight_name_entry = Entry(preview_frame_bottom, fg='blue', font=('Arial', 16, 'bold'), width=10)
-            # weight_name_entry.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
-            # weight_name_entry.insert("end", "Weight of the " + str(subcategories_chosen) + ": ")
-            # weight_name_entry.config(state=DISABLED)
-            # weight_entry = Entry(preview_frame_bottom, fg='blue', font=('Arial', 16, 'bold'), width=10)
-            # weight_entry.grid(row=0, column=1, columnspan=3, padx=10, pady=10)
-            # weight_name_entry.insert("end", "5")
             for widget in preview_frame_bottom.winfo_children():
                 widget.destroy()
 
             key = subcategories_chosen
             labels = db.countries
             name = "Preview for " + str(expert_chosen) + ": "
-            # "Preview for " + str(expert_chosen) + ": " + str(key) + ", " + str()
             if category_chosen == NO_CATEGORY:
                 key = "categories"
                 labels = db.categories
-                name += "categories weights"
+                name += "categories' weights"
             else:
                 if subcategories_chosen == NO_SUBCATEGORY:
                     key = category_chosen
@@ -574,27 +573,19 @@ def preview():
                 for widget in preview_frame_bottom.winfo_children():
                     if isinstance(widget, Entry):
                         values.append(widget.get())
-                        # print(widget.get())
 
                 mod = len(labels)
-                values = values[mod*2:]
+                values = values[mod * 2:]
                 for v in values:
                     if not isfloat(v) or float(v) <= 0 or float(v) > 9:
-                        # print(not isfloat(v))
-                        # print(float(values[v]))
-                        # print(v)
-
-                        showinfo(title='Invalid data!',
-                                 message="Values need to be float type in range [1/9,9]")
+                        showinfo(title='Invalid data!', message="Values need to be float type in range [1/9,9]")
                         return
-
 
                 true_category = category_chosen
                 if subcategories_chosen != NO_SUBCATEGORY:
                     true_category = subcategories_chosen
                 if true_category == NO_CATEGORY:
                     true_category = "categories"
-                # print(values)
                 for v in range(len(values)):
                     if v // mod < v % mod:
                         db.set_matrix_field(true_category, expert_chosen, v // mod, v % mod, float(values[v]))
@@ -605,7 +596,7 @@ def preview():
                 pass
 
             save_button = Button(preview_frame_bottom, text="Save", font=FONT, command=save, width=10)
-            save_button.grid(row=len(labels) + 1, columnspan=len(labels) + 1,  pady=10, padx=10)
+            save_button.grid(row=len(labels) + 1, columnspan=len(labels) + 1, pady=10, padx=10)
 
     def add_opinion():
         nonlocal expert_chosen, category_chosen, subcategories_chosen
@@ -627,11 +618,9 @@ def preview():
                 widget.destroy()
 
             names = db.countries
-            print(names)
             label = ""
 
             if subcategories_chosen == NO_SUBCATEGORY:
-                # key = category_chosen
                 if len(db.subcategories_map.get(category_chosen)) > 0:
                     names = list(db.subcategories_map.get(category_chosen))
                     label = "Comparison " + expert_chosen + " for weights within " + category_chosen
@@ -665,13 +654,9 @@ def preview():
                 _break = False
 
                 if idx > 0:
-                    # print(previous_idx1, "to", previous_idx2, s1.get() / s2.get(), "for", expert_chosen,
-                    #       category_chosen, subcategories_chosen)
-
                     true_category = category_chosen
                     if subcategories_chosen != NO_SUBCATEGORY:
                         true_category = subcategories_chosen
-                    # print(true_category, expert_chosen, previous_idx1, previous_idx2, s1.get() / s2.get())
                     db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1, s1.get() / s2.get())
 
                 idx_copy = idx
@@ -711,7 +696,6 @@ def preview():
                     e2.insert(0, current_name2)
                     e2.config(state=DISABLED)
 
-            # TODO dodawanie do database
             _next()
 
             next_button = Button(preview_frame_bottom, text="Next", font=FONT, command=_next)
@@ -748,7 +732,6 @@ preview_button.grid(column=column_no, row=0, rowspan=row_no, pady=10, padx=10)
 
 def solve():
     if db.is_missing_data():
-        # print(db.is_missing_data())
         showinfo(title='Missing data', message="First you need fill all the necessary opinions!\n"
                                                "You can do it in \"Show experts' opinions\" section.")
     else:
@@ -757,16 +740,11 @@ def solve():
 
         results = Toplevel()
         results.title("Ranking")
-        results.geometry("1600x900")
-        # "1024x576"
+        results.geometry("1600x900")  # "1024x576"
         results.resizable(False, False)
 
         frame = Frame(results, bg="light grey", pady=10, padx=10)
-        # frame.config(anchor=CENTER)
-        # frame.pack(fill=BOTH, expand=True)
         frame.grid(sticky=SE, padx=5, pady=5)
-
-        labels = []
 
         ahp = AHP(db)
         rank = ahp.calculate_ranking()
@@ -778,11 +756,24 @@ def solve():
         # TODO ewentualnie jakieś bajery do wyświetlania
         top = ranking[0][1]
         multi = 100 / top
-        for country in ranking:
-            label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                              font=("Arial", round(country[1] * multi)))
-            label_tmp.grid(sticky=S)
-            labels.append(label_tmp)
+        label_tmp = Label(frame, text="Which country is best\nto declare war on?", font=("Arial", 50, "bold"))
+        label_tmp.grid(sticky=S, pady=10, padx=10)
+        # labels.append(label_tmp)
+        for idx, country in enumerate(ranking):
+            if idx == 0:
+                label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                  font=("Arial", round(country[1] * multi)), fg="#F00")
+            elif idx == 1:
+                label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                  font=("Arial", round(country[1] * multi)), fg="#A00")
+            elif idx == 2:
+                label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                  font=("Arial", round(country[1] * multi)), fg="#500")
+            else:
+                label_tmp = Label(frame, text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                  font=("Arial", round(country[1] * multi)))
+            label_tmp.grid(sticky=S, pady=10, padx=10)
+            # labels.append(label_tmp)
 
 
 buttonSolve = Button(main_window, text="Solve", font=("Arial", 26), command=solve, bg="blue", fg="pink", width=40)
