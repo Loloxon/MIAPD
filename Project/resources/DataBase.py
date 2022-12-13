@@ -1,6 +1,10 @@
+from __future__ import annotations
+
+import pickle
 from copy import deepcopy
 from typing import Dict, List, Union, Tuple
 import numpy as np
+
 
 # Kolejność robienia rzeczy
 # 1. Załadowanie nazw kategorii, krajów i ekspertów z pliku
@@ -9,13 +13,12 @@ import numpy as np
 
 class DataBase:
     def __init__(self):
-        # TODO add loading from file
         self._subcategories_map: Dict[str, List[str]] = dict()
         self._matrices: Dict[str, List[np.array]] = dict()
         self._experts = []
         self._countries = []
         self._categories = []
-        self.generate_matrices()  # TODO replace with loading from file
+        self._generate_matrices()
 
     def add_expert(self, name: str) -> None:
         self._experts.append(name)
@@ -33,7 +36,7 @@ class DataBase:
                     for i, matrix in enumerate(self._matrices[subcategory]):
                         self._matrices[subcategory][i] = add_row_col(matrix)
 
-    def generate_matrices(self) -> None:
+    def _generate_matrices(self) -> None:
         new_matrices = dict()
         for k, v in self._subcategories_map.items():
             if not v:
@@ -137,6 +140,15 @@ class DataBase:
             if missing_for_expert:
                 missing_matrices.append((self._experts[i], missing_for_expert))
         return missing_matrices
+
+    def save(self, path: str = 'DataBase.pkl') -> None:
+        with open(path, 'wb') as f:
+            pickle.dump(self, f)
+
+    @classmethod
+    def load(cls, path: str = 'DataBase.pkl') -> DataBase:
+        with open(path, 'rb') as f:
+            return pickle.load(f)
 
     @property
     def matrices(self) -> Dict[str, List[np.array]]:
