@@ -47,5 +47,12 @@ class AHP:
         country_ranking = [country for _, country in sorted(zip(weights, countries), reverse=True)]
         return country_ranking, sorted(weights, reverse=True)
 
+    def get_inconstistency_index(self, matrix: np.array) -> float:
+        # TODO check if it is correct
+        n = matrix.shape[0]
+        eigenvalues, _ = np.linalg.eig(matrix)
+        max_eigenvalue = np.max(eigenvalues)
+        return (max_eigenvalue - n) / (n - 1)
+
 
 
