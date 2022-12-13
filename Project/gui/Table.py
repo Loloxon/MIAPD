@@ -1,6 +1,6 @@
 from tkinter import *
 
-FONT = ('Arial', 16, 'bold')
+FONT = ('Arial', 16)
 FONT_BIG = ('Arial', 20, 'bold')
 
 

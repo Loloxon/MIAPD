@@ -104,6 +104,7 @@ class DataBase:
         return deepcopy(self._matrices[name][expert])
 
     def set_matrix_field(self, name: str, expert: Union[int, str], i: Union[int, str], j: Union[int, str], value: float) -> None:
+        print("adding")
         if isinstance(expert, str):
             expert = self._experts.index(expert)
         if isinstance(i, str):
