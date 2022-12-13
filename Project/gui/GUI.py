@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.messagebox import showinfo
+from tkinter.scrolledtext import ScrolledText
 
 import numpy as np
 
@@ -32,27 +33,28 @@ def isfloat(num):
 
 
 def init(db):
-    db.add_expert('expert1')
-    db.add_country('country1')
-    db.add_country('country3')
-    db.add_country('country2')
-    db.add_country('country4')
+    db.add_expert('Bob, The Expert')
+    db.add_country('USA')
+    db.add_country('Russia')
+    db.add_country('Germany')
+    db.add_country('Japan')
 
-    db.add_category('cost')
-    db.add_subcategory('cost', 'purchase')
-    db.add_subcategory('cost', 'fuel')
-    db.add_subcategory('cost', 'maintenance')
-    db.add_category('safety')
-    db.add_category('design')
-    db.add_subcategory('capacity', 'trunk')
-    db.add_subcategory('capacity', 'passenger')
-    db.add_category('warranty')
+    db.add_category('Army(')
+    db.add_subcategory('Army(', 'Navy')
+    db.add_subcategory('Army(', 'Ground Forces')
+    db.add_subcategory('Army(', 'Air Forces')
+    db.add_category('Distance')
+    db.add_category('Potential Allies')
+    db.add_category('Economy')
+    db.add_subcategory('Economy', 'Current')
+    db.add_subcategory('Economy', 'Predictions')
+    db.add_category('Political Relationships')
 
     array = np.array([[1, 7, 8],
                       [1 / 7, 1, 3],
                       [1 / 8, 1 / 3, 1]])
-    matrix = "cost"
-    expert = "expert1"
+    matrix = "Army("
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
@@ -62,8 +64,8 @@ def init(db):
          [5 / 7, 1, 6 / 7, 7 / 6],
          [9 / 4, 7 / 6, 1, 3 / 2],
          [5 / 4, 6 / 7, 2 / 3, 1]])
-    matrix = "purchase"
-    expert = "expert1"
+    matrix = "Navy"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
@@ -72,8 +74,8 @@ def init(db):
                       [3 / 7, 1, 8 / 5, 8 / 5],
                       [5 / 9, 5 / 8, 1, 2],
                       [1 / 2, 5 / 8, 1 / 2, 1]])
-    matrix = "fuel"
-    expert = "expert1"
+    matrix = "Ground Forces"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
@@ -83,8 +85,8 @@ def init(db):
          [5 / 7, 1, 2, 6 / 5],
          [3 / 4, 1 / 2, 1, 3 / 2],
          [9 / 5, 5 / 6, 2 / 3, 1]])
-    matrix = "maintenance"
-    expert = "expert1"
+    matrix = "Air Forces"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
@@ -93,8 +95,8 @@ def init(db):
                       [2 / 5, 1, 1 / 9, 1 / 4],
                       [9, 9, 1, 5],
                       [7, 4, 1 / 5, 1]])
-    matrix = "safety"
-    expert = "expert1"
+    matrix = "Distance"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
@@ -103,16 +105,16 @@ def init(db):
                       [9, 1, 5, 9 / 8],
                       [9, 1 / 5, 1, 7 / 9],
                       [9, 8 / 9, 9 / 7, 1]])
-    matrix = "design"
-    expert = "expert1"
+    matrix = "Potential Allies"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
 
     array = np.array([[1, 3],
                       [1 / 3, 1]])
-    matrix = "capacity"
-    expert = "expert1"
+    matrix = "Economy"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
@@ -122,8 +124,8 @@ def init(db):
          [5 / 6, 1, 5 / 9, 7 / 5],
          [3 / 2, 9 / 5, 1, 1],
          [2 / 5, 5 / 7, 1, 1]])
-    matrix = "trunk"
-    expert = "expert1"
+    matrix = "Current"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
@@ -132,8 +134,8 @@ def init(db):
                       [1 / 9, 1, 2 / 3, 1 / 9],
                       [1 / 9, 3 / 2, 1, 1 / 9],
                       [8 / 3, 9, 9, 1]])
-    matrix = "passenger"
-    expert = "expert1"
+    matrix = "Predictions"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
@@ -142,8 +144,8 @@ def init(db):
                       [1 / 9, 1, 1 / 9, 1 / 9],
                       [3 / 4, 9, 1, 1 / 2],
                       [5 / 7, 9, 2, 1]])
-    matrix = "warranty"
-    expert = "expert1"
+    matrix = "Political Relationships"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
@@ -154,13 +156,14 @@ def init(db):
                       [5 / 9, 5 / 7, 7 / 3, 1, 7 / 9],
                       [1 / 8, 4 / 5, 4 / 3, 9 / 7, 1]])
     matrix = "categories"
-    expert = "expert1"
+    expert = "Bob, The Expert"
     for i in range(len(array)):
         for j in range(len(array[0])):
             db.set_matrix_field(matrix, expert, i, j, array[i][j])
 
 
 init(db)
+ahp = AHP(db)
 
 # print(db.matrices)
 # ahp = AHP(db)
@@ -174,7 +177,7 @@ column_no = 0
 row_no = 1
 country_no = 0
 
-country_list = Text(main_window, font=FONT, width=20, height=18)
+country_list = ScrolledText(main_window, font=FONT, width=20, height=18)
 for country in db.countries:
     country_list.insert("end", "● " + country + "\n")
 country_list.config(state=DISABLED)
@@ -211,7 +214,7 @@ column_no = 1
 row_no = 1
 category_no = 0
 
-category_list = Text(main_window, font=FONT, width=20, height=18)
+category_list = ScrolledText(main_window, font=FONT, width=20, height=18)
 for category in db.categories:
     category_list.insert("end", "● " + category + "\n")
     for subcategory in db.subcategories_map.get(category):
@@ -253,7 +256,7 @@ column_no = 2
 row_no = 1
 expert_no = 0
 
-expert_list = Text(main_window, font=FONT, width=20, height=18)
+expert_list = ScrolledText(main_window, font=FONT, width=20, height=18)
 for category in db.experts:
     expert_list.insert("end", "● " + category + "\n")
 expert_list.config(state=DISABLED)
@@ -374,7 +377,7 @@ def add_expert(entry):
                     break
 
             if finishing:
-                showinfo(title='Comparing done', message="All pairs for this category have been compared!\n"
+                showinfo(title='Comparing done', message="All pAirs for this category have been compared!\n"
                                                          "Saving opinions.")
                 save()
             else:
@@ -551,7 +554,7 @@ def preview():
 
             key = subcategories_chosen
             labels = db.countries
-            name = "Preview for " + str(expert_chosen) + ": "
+            name = "Preview for " + str(expert_chosen) + ":\n"
             if category_chosen == NO_CATEGORY:
                 key = "categories"
                 labels = db.categories
@@ -566,6 +569,8 @@ def preview():
                 else:
                     name += str(subcategories_chosen) + " (" + str(category_chosen) + ")"
             matrix = db.get_matrix(key, expert_chosen)
+            index_sth = ahp.get_inconsistency_index(key, expert_chosen)
+            name += "\nIndeks niespójności macierzy: " + str(round(index_sth, 5))
             Table(preview_frame_bottom, matrix, labels, preview_frame_top, name)
 
             def save():
@@ -677,7 +682,7 @@ def preview():
                         break
 
                 if finishing:
-                    showinfo(title='Comparing done', message="All pairs for this category have been compared!\n"
+                    showinfo(title='Comparing done', message="All pAirs for this category have been compared!\n"
                                                              "Saving opinions.")
                     save()
                 else:
@@ -735,8 +740,8 @@ def solve():
         showinfo(title='Missing data', message="First you need fill all the necessary opinions!\n"
                                                "You can do it in \"Show experts' opinions\" section.")
     else:
-        label = Label(main_window, text="Clicked")
-        label.grid(sticky=S, columnspan=5, pady=10, padx=10)
+        # label = Label(main_window, text="Clicked")
+        # label.grid(sticky=S, columnspan=5, pady=10, padx=10)
 
         results = Toplevel()
         results.title("Ranking")
@@ -746,7 +751,6 @@ def solve():
         frame = Frame(results, bg="light grey", pady=10, padx=10)
         frame.grid(sticky=SE, padx=5, pady=5)
 
-        ahp = AHP(db)
         rank = ahp.calculate_ranking()
 
         ranking = []
