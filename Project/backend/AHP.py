@@ -1,3 +1,4 @@
+from itertools import combinations
 from typing import List, Tuple, Union
 
 import numpy as np
@@ -49,13 +50,14 @@ class AHP:
 
     def get_inconsistency_index(self, matrix: str, expert: Union[int, str]) -> float:
         matrix = self._db.get_matrix(matrix, expert)
+        index = 0
 
-        # TODO check calculating inconsistency_index
-        eigenvalues, eigenvectors = np.linalg.eig(matrix)
-        max_eigenvalue = max(eigenvalues)
-        index = (max_eigenvalue - matrix.shape[0]) / (matrix.shape[0] - 1)
+        for i, j, k in combinations(range(matrix.shape[0]), 3):
+            index = max(index, koczkodaj_index(matrix, i, j, k))
+
         return index
 
 
-
+def koczkodaj_index(matrix: np.array, i: int, j: int ,k: int) -> float:
+    return min(abs(1-matrix[i][j]*matrix[j][k]/matrix[i][k]), abs(1-matrix[i][k]/(matrix[i][j] * matrix[j][k])))
 
