@@ -13,13 +13,12 @@ import numpy as np
 
 class DataBase:
     def __init__(self):
-        # TODO add loading from file
         self._subcategories_map: Dict[str, List[str]] = dict()
         self._matrices: Dict[str, List[np.array]] = dict()
         self._experts = []
         self._countries = []
         self._categories = []
-        self.generate_matrices()  # TODO replace with loading from file
+        self.generate_matrices()
 
     def add_expert(self, name: str) -> None:
         self._experts.append(name)
