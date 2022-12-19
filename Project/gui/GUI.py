@@ -309,7 +309,6 @@ class GUI:
 
             # for i in range(len(experts)):
             for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
-                print(i)
                 coloring = False
                 for expert, _ in missing_data:
                     if expert_listbox == expert:
@@ -388,11 +387,8 @@ class GUI:
                 if expert_chosen != "" and category_chosen != "" and subcategories_chosen != "":
                     chosen_options = True
 
-                print(missing_data)
-
                 # for i in range(len(experts)):
                 for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
-                    print(i)
                     coloring = False
                     for expert, _ in missing_data:
                         if expert_listbox == expert:
