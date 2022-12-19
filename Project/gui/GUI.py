@@ -66,37 +66,57 @@ class GUI:
         add_country_button.grid(row=row_no + 2, column=column_no)
 
     def create_category_part(self, root, column_no, row_no):
-        category_list = ScrolledText(root, font=self.FONT, width=20, height=18)
+        category_list = Listbox(root, font=self.FONT, width=20, height=18)
+        previous_selected = None
+
+        def deselect_item(event):
+            nonlocal previous_selected
+            if category_list.curselection() == previous_selected:
+                category_list.selection_clear(0, END)
+            previous_selected = category_list.curselection()
+
+        root.bind('<ButtonPress-1>', deselect_item)
+
         for category in self.db.categories:
-            category_list.insert("end", "● " + category + "\n")
+            category_list.insert("end", "● " + category)
             for subcategory in self.db.subcategories_map.get(category):
-                category_list.insert("end", "   - " + subcategory + "\n")
-        category_list.config(state=DISABLED)
+                category_list.insert("end", "   - " + subcategory)
         category_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
 
-        def add_category(entry):
+        def add_category(entry, listbox):
+            selected_indices = listbox.curselection()
+            chosen_category = ""
+            if len(selected_indices) > 0:
+                chosen_category = listbox.get(selected_indices[0])
+                if chosen_category[0] == "●":
+                    chosen_category = chosen_category[2:]
+                else:
+                    chosen_category = chosen_category[5:]
+
             if entry.get() in self.db.categories:
                 showinfo(title='Invalid name!', message="Given category already exists in the database!")
+            elif chosen_category != "" and chosen_category not in self.db.subcategories_map.keys():
+                showinfo(title='Invalid subcategory!', message="You can't chose subcategory!\nYou need to chose "
+                                                               "normal category or none (by clicking outside of the "
+                                                               "listbox).")
             else:
-                self.db.add_category(entry.get())
-                category_list.config(state=NORMAL)
-                category_list.insert("end", "● " + entry.get() + "\n")
-                category_list.config(state=DISABLED)
-                for subcategory in self.db.subcategories_map.get(entry.get()):
-                    category_list.config(state=NORMAL)
-                    category_list.insert("end", " - " + subcategory + "\n")
-                    category_list.config(state=DISABLED)
-            self.category_no += 1
-            entry.delete(0, "end")
-            entry.insert(0, "Unknown Criterion " + str(self.category_no))
+                if chosen_category == "":
+                    self.db.add_category(entry.get())
+                    category_list.insert("end", "● " + entry.get())
+                else:
+                    self.db.add_subcategory(chosen_category, entry.get())
+                    category_list.insert("end", "   - " + entry.get())
+                self.category_no += 1
+                entry.delete(0, "end")
+                entry.insert(0, "Unknown Category " + str(self.category_no))
 
-        add_category_label = Label(root, text="Enter new category", font=self.LABEL_FONT)
+        add_category_label = Label(root, text="Enter new (sub)category", font=self.LABEL_FONT)
         add_category_label.grid(row=row_no + 0, column=column_no)
         add_category_entry = Entry(root, width=20, font=self.FONT)
-        add_category_entry.insert(0, "Unknown Criterion 0")
+        add_category_entry.insert(0, "Unknown Category 0")
         add_category_entry.grid(row=row_no + 1, column=column_no, padx=15, pady=5)
-        add_category_button = Button(root, text="Add new category", font=self.FONT,
-                                     command=lambda: add_category(add_category_entry))
+        add_category_button = Button(root, text="Add new (sub)category", font=self.FONT,
+                                     command=lambda: add_category(add_category_entry, category_list))
         add_category_button.grid(row=row_no + 2, column=column_no, padx=50)
 
     def create_expert_part(self, root, column_no, row_no):
@@ -118,7 +138,7 @@ class GUI:
                 self.root.withdraw()
                 new_expert_window = Toplevel()
                 new_expert_window.title("Opinions")
-                new_expert_window.geometry("720x480")
+                new_expert_window.geometry("860x480")
                 # "1024x576"
                 new_expert_window.resizable(False, False)
 
@@ -676,15 +696,18 @@ class GUI:
                     if idx == 0:
                         label_tmp = Label(scrollable_frame,
                                           text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), fg="#F00", justify=RIGHT, bg="#AAA")
+                                          font=("Arial", round(country[1] * multi)), fg="#F00", justify=RIGHT,
+                                          bg="#AAA")
                     elif idx == 1:
                         label_tmp = Label(scrollable_frame,
                                           text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), fg="#A00", justify=RIGHT, bg="#AAA")
+                                          font=("Arial", round(country[1] * multi)), fg="#A00", justify=RIGHT,
+                                          bg="#AAA")
                     elif idx == 2:
                         label_tmp = Label(scrollable_frame,
                                           text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), fg="#500", justify=RIGHT, bg="#AAA")
+                                          font=("Arial", round(country[1] * multi)), fg="#500", justify=RIGHT,
+                                          bg="#AAA")
                     else:
                         label_tmp = Label(scrollable_frame,
                                           text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
