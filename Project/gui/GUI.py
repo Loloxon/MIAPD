@@ -92,7 +92,7 @@ class GUI:
                     chosen_category = chosen_category[2:]
                 else:
                     chosen_category = chosen_category[5:]
-
+#TODO wykrywanie rowniez z podkryteriow a nie tylko kryteriow
             if entry.get() in self.db.categories:
                 showinfo(title='Invalid name!', message="Given category already exists in the database!")
             elif chosen_category != "" and chosen_category not in self.db.subcategories_map.keys():
