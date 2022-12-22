@@ -219,7 +219,7 @@ class GUI:
 
                     if idx > 0:
                         self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
-                                                 s1.get() / s2.get())
+                                                 s2.get() / s1.get())
 
                     idx_copy = idx
                     for index, label in enumerate(labels):
@@ -274,7 +274,7 @@ class GUI:
                 def save():
                     if idx > 0:
                         self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
-                                                 s1.get() / s2.get())
+                                                 s2.get() / s1.get())
 
                     # TODO zapisywanie zmian
                     self.root.deiconify()
@@ -514,7 +514,8 @@ class GUI:
                             values = values[mod * 2:]
                             for v in values:
                                 if not isfloat(v) or float(v) <= 0 or float(v) > 9:
-                                    showinfo(title='Invalid data!', message="Values need to be float type in range [1/9,9]")
+                                    showinfo(title='Invalid data!',
+                                             message="Values need to be float type in range [1/9,9]")
                                     return
 
                             true_category = category_chosen
@@ -537,9 +538,14 @@ class GUI:
                     nonlocal expert_chosen, category_chosen, subcategories_chosen
 
                     def missing_data(expert_chosen, category_chosen, subcategories_chosen):
+                        if category_chosen == "<no category>":
+                            category_chosen = "categories"
+                        print(expert_chosen, category_chosen, subcategories_chosen)
+                        print(self.db.is_missing_data())
                         for missing_expert, missing_categories in self.db.is_missing_data():
                             if missing_expert == expert_chosen and (category_chosen in missing_categories or
-                                                                    subcategories_chosen in missing_categories):
+                                                                    subcategories_chosen in missing_categories
+                            ):
                                 return True
                         return False
 
@@ -555,10 +561,12 @@ class GUI:
 
                         names = self.db.countries
                         label = ""
-
-                        if subcategories_chosen == self.NO_SUBCATEGORY:
+                        if category_chosen == self.NO_CATEGORY:
+                            names = list(self.db.categories)
+                            label = "Comparison " + expert_chosen + " for weights within categories"
+                        elif subcategories_chosen == self.NO_SUBCATEGORY:
                             if len(self.db.subcategories_map.get(category_chosen)) > 0:
-                                names = list(self.db.subcategories_map.get(category_chosen))
+                                names = self.db.subcategories_map.get(category_chosen)
                                 label = "Comparison " + expert_chosen + " for weights within " + category_chosen
                             else:
                                 label = "Comparison " + expert_chosen + " for " + category_chosen
@@ -591,10 +599,12 @@ class GUI:
 
                             if idx > 0:
                                 true_category = category_chosen
-                                if subcategories_chosen != self.NO_SUBCATEGORY:
+                                if category_chosen == self.NO_CATEGORY:
+                                    true_category = "categories"
+                                elif subcategories_chosen != self.NO_SUBCATEGORY:
                                     true_category = subcategories_chosen
                                 self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
-                                                         s1.get() / s2.get())
+                                                         s2.get() / s1.get())
 
                             idx_copy = idx
                             for idx1 in range(len(names)):
@@ -614,8 +624,9 @@ class GUI:
                                     break
 
                             if finishing:
-                                showinfo(title='Comparing done', message="All pAirs for this category have been compared!\n"
-                                                                         "Saving opinions.")
+                                showinfo(title='Comparing done',
+                                         message="All pAirs for this category have been compared!\n"
+                                                 "Saving opinions.")
                                 save()
                             else:
                                 e_label.config(state=NORMAL)
@@ -639,6 +650,14 @@ class GUI:
                         next_button.grid(row=2, column=0, columnspan=2, pady=10, padx=10)
 
                         def save():
+                            if idx > 0:
+                                true_category = category_chosen
+                                if category_chosen == self.NO_CATEGORY:
+                                    true_category = "categories"
+                                elif subcategories_chosen != self.NO_SUBCATEGORY:
+                                    true_category = subcategories_chosen
+                                self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
+                                                         s2.get() / s1.get())
                             # TODO zapisywanie zmian
                             for widget in preview_frame_bottom.winfo_children():
                                 widget.destroy()
@@ -694,13 +713,13 @@ class GUI:
                     self.db.remove_subcategory(category, subcategory)
             for category in self.db.categories:
                 self.db.remove_category(category)
-                
+
             self.refresh()
 
             self.db.load()
 
         add_clear_all_button = Button(root, text="Clear all data", font=self.FONT, command=clear, width=14,
-                                 height=4, bg="light grey")
+                                      height=4, bg="light grey")
         add_clear_all_button.grid(row=row_no, column=column_no)
 
     def create_solve_button(self, root, column_no, row_no):
@@ -770,7 +789,7 @@ class GUI:
         buttonSolve = Button(root, text="Solve", font=("Arial", 26), command=solve, bg="blue", fg="pink",
                              width=40)
         buttonSolve.grid(row=row_no, sticky=N, columnspan=3, pady=10, padx=10)
-        
+
     def refresh(self):
         for widget in self.main_window.winfo_children():
             widget.destroy()
