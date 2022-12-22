@@ -591,25 +591,25 @@ class GUI:
                         previous_idx1 = -1
                         previous_idx2 = -1
 
+                        true_category = category_chosen
+                        if category_chosen == self.NO_CATEGORY:
+                            true_category = "categories"
+                        elif subcategories_chosen != self.NO_SUBCATEGORY:
+                            true_category = subcategories_chosen
+
                         def _next():
-                            nonlocal idx, names, label, e_label, e1, e2, s1, s2, previous_idx1, previous_idx2, expert_chosen, \
-                                category_chosen, subcategories_chosen
+                            nonlocal idx, names, label, e_label, e1, e2, s1, s2, previous_idx1, previous_idx2
                             finishing = True
                             _break = False
 
                             if idx > 0:
-                                true_category = category_chosen
-                                if category_chosen == self.NO_CATEGORY:
-                                    true_category = "categories"
-                                elif subcategories_chosen != self.NO_SUBCATEGORY:
-                                    true_category = subcategories_chosen
                                 self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
                                                          s2.get() / s1.get())
 
-                            idx_copy = idx
                             for idx1 in range(len(names)):
                                 for idx2 in range(idx1 + 1, len(names)):
-                                    if idx_copy == 0:
+                                    print(self.db.get_matrix(true_category, expert_chosen)[idx2][idx1])
+                                    if self.db.get_matrix(true_category, expert_chosen)[idx2][idx1] == 0.0:
                                         idx += 1
                                         finishing = False
                                         current_name1 = names[idx1]
@@ -617,15 +617,12 @@ class GUI:
                                         previous_idx1 = idx1
                                         previous_idx2 = idx2
                                         _break = True
-                                    if _break:
-                                        break
-                                    idx_copy -= 1
                                 if _break:
                                     break
 
                             if finishing:
                                 showinfo(title='Comparing done',
-                                         message="All pAirs for this category have been compared!\n"
+                                         message="All pairs for this category have been compared!\n"
                                                  "Saving opinions.")
                                 save()
                             else:
@@ -651,11 +648,6 @@ class GUI:
 
                         def save():
                             if idx > 0:
-                                true_category = category_chosen
-                                if category_chosen == self.NO_CATEGORY:
-                                    true_category = "categories"
-                                elif subcategories_chosen != self.NO_SUBCATEGORY:
-                                    true_category = subcategories_chosen
                                 self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
                                                          s2.get() / s1.get())
                             # TODO zapisywanie zmian
