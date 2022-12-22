@@ -40,13 +40,16 @@ class DataBase:
         new_matrices = dict()
         for k, v in self._subcategories_map.items():
             if not v:
-                new_matrices[k] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
+                new_matrices[k] = [np.identity(len(self._countries), dtype=np.float64) for _ in
+                                   range(len(self._experts))]
                 continue
             new_matrices[k] = [np.identity(len(v), dtype=np.float64) for _ in range(len(self._experts))]
             for sub in v:
-                new_matrices[sub] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
+                new_matrices[sub] = [np.identity(len(self._countries), dtype=np.float64) for _ in
+                                     range(len(self._experts))]
         number_of_categories = len(self._subcategories_map.keys())
-        new_matrices['categories'] = [np.identity(number_of_categories, dtype=np.float64) for _ in range(len(self._experts))]
+        new_matrices['categories'] = [np.identity(number_of_categories, dtype=np.float64) for _ in
+                                      range(len(self._experts))]
         self._matrices = new_matrices
 
     def add_category(self, category: str) -> None:
@@ -54,19 +57,21 @@ class DataBase:
         self._categories.append(category)
         for i, matrix in enumerate(self._matrices['categories']):
             self._matrices['categories'][i] = add_row_col(matrix)
-        self._matrices[category] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
+        self._matrices[category] = [np.identity(len(self._countries), dtype=np.float64) for _ in
+                                    range(len(self._experts))]
 
     def add_subcategory(self, category: str, subcategory: str) -> None:
         if category not in self._subcategories_map.keys():
             self.add_category(category)
         self._subcategories_map[category].append(subcategory)
-        if len(self._subcategories_map[category]) == 1: # if it's the first subcategory we need to make new matrix
+        if len(self._subcategories_map[category]) == 1:  # if it's the first subcategory we need to make new matrix
             self._matrices[category] = [np.identity(1, dtype=np.float64) for _ in range(len(self._experts))]
         else:
             for i, matrix in enumerate(self._matrices[category]):
                 self._matrices[category][i] = add_row_col(matrix)
 
-        self._matrices[subcategory] = [np.identity(len(self._countries), dtype=np.float64) for _ in range(len(self._experts))]
+        self._matrices[subcategory] = [np.identity(len(self._countries), dtype=np.float64) for _ in
+                                       range(len(self._experts))]
 
     def remove_expert(self, name: str) -> None:
         for category, matrices in self._matrices.items():
@@ -106,7 +111,8 @@ class DataBase:
         # for weight of categories use name 'categories'
         return deepcopy(self._matrices[name][expert])
 
-    def set_matrix_field(self, name: str, expert: Union[int, str], i: Union[int, str], j: Union[int, str], value: float) -> None:
+    def set_matrix_field(self, name: str, expert: Union[int, str], i: Union[int, str], j: Union[int, str],
+                         value: float) -> None:
         if isinstance(expert, str):
             expert = self._experts.index(expert)
         if isinstance(i, str):
@@ -120,9 +126,9 @@ class DataBase:
             else:
                 j = self._countries.index(j)
         self._matrices[name][expert][i][j] = value
-        self._matrices[name][expert][j][i] = max(min(1/value, 9), 1/9)
+        self._matrices[name][expert][j][i] = max(min(1 / value, 9), 1 / 9)
 
-# not used anymore
+    # not used anymore
     # def set_matrix(self, name: str, expert: Union[int, str], matrix: np.array) -> None:
     #     if isinstance(expert, str):
     #         expert = self._experts_map[expert]
@@ -141,12 +147,15 @@ class DataBase:
                 missing_matrices.append((self._experts[i], missing_for_expert))
         return missing_matrices
 
-    def save(self, path: str = 'DataBase.pkl') -> None:
+    def enough_data(self) -> bool:
+        return self._experts and self._categories and len(self._countries) > 1
+
+    def save(self, path: str = 'resources/DataBase.pkl') -> None:
         with open(path, 'wb') as f:
             pickle.dump(self, f)
 
     @classmethod
-    def load(cls, path: str = 'DataBase.pkl') -> DataBase:
+    def load(cls, path: str = 'resources/DataBase.pkl') -> DataBase:
         with open(path, 'rb') as f:
             return pickle.load(f)
 

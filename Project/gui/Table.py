@@ -22,8 +22,8 @@ class Table:
             self.e.grid(row=0, column=i + 1)
             self.e.insert("end", labels[i])
             self.e.config(state=DISABLED)
-        for i in range(len(values)):
-            for j in range(len(values[0])):
+        for i in range(min(len(values), len(labels))):
+            for j in range(min(len(values[0]), len(labels))):
                 self.e = Entry(root, fg='blue', font=FONT, width=10, justify=CENTER)
                 self.e.grid(row=i + 1, column=j + 1)
                 self.e.insert("end", round(values[i][j], 3))

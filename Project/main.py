@@ -136,5 +136,6 @@ def init_data_base():
 
 if __name__ == '__main__':
     db = DataBase()
-    init_data_base()
+    db = db.load()
+    # init_data_base()
     gui = GUI(db)

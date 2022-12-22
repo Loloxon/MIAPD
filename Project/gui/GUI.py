@@ -18,8 +18,8 @@ class GUI:
         self.root.geometry("1600x900")
         self.root.resizable(False, False)
 
-        main_window = Frame(self.root, relief='sunken')
-        main_window.pack(fill=BOTH, expand=True, padx=100, pady=10)
+        self.main_window = Frame(self.root, relief='sunken')
+        self.main_window.pack(fill=BOTH, expand=True, padx=100, pady=10)
 
         self.db = data_base
         self.ahp = AHP(self.db)
@@ -28,20 +28,23 @@ class GUI:
         self.category_no = 0
         self.expert_no = 0
 
-        self.create_country_part(main_window, 0, 1)
-        self.create_category_part(main_window, 1, 1)
-        self.create_expert_part(main_window, 2, 1)
-        self.create_preview_button(main_window, 3, 4)
-        self.create_solve_button(main_window, 3, 0)
+        self.create_country_part(self.main_window, 0, 1)
+        self.create_category_part(self.main_window, 1, 1)
+        self.create_expert_part(self.main_window, 2, 1)
+        self.create_preview_button(self.main_window, 3, 0, 4)
+        self.create_save_button(self.main_window, 3, 4)
+        self.create_load_button(self.main_window, 3, 5)
+        self.create_clear_all_button(self.main_window, 3, 6)
+        self.create_solve_button(self.main_window, 3, 0)
 
-        main_window.mainloop()
+        self.main_window.mainloop()
 
     def create_country_part(self, root, column_no, row_no):
         country_list = ScrolledText(root, font=self.FONT, width=20, height=18)
         for country in self.db.countries:
             country_list.insert("end", "● " + country + "\n")
         country_list.config(state=DISABLED)
-        country_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
+        country_list.grid(row=row_no + 3, sticky=N, column=column_no, rowspan=3, padx=15, pady=5)
 
         def add_country(entry):
             if entry.get() in self.db.countries:
@@ -61,7 +64,7 @@ class GUI:
         add_country_entry.insert(0, "Unknown Country 0")
         add_country_entry.grid(row=row_no + 1, column=column_no, padx=15, pady=5)
         add_country_button = Button(root, text="Add new country", font=self.FONT,
-                                    command=lambda: add_country(add_country_entry))
+                                    command=lambda: add_country(add_country_entry), bg="light grey")
         add_country_button.grid(row=row_no + 2, column=column_no)
 
     def create_category_part(self, root, column_no, row_no):
@@ -80,7 +83,7 @@ class GUI:
             category_list.insert("end", "● " + category)
             for subcategory in self.db.subcategories_map.get(category):
                 category_list.insert("end", "   - " + subcategory)
-        category_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
+        category_list.grid(row=row_no + 3, sticky=N, column=column_no, rowspan=3, padx=15, pady=5)
 
         def add_category(entry, listbox):
             selected_indices = listbox.curselection()
@@ -109,7 +112,7 @@ class GUI:
                     self.db.add_category(entry.get())
                 else:
                     self.db.add_subcategory(chosen_category, entry.get())
-                category_list.delete(0,END)
+                category_list.delete(0, END)
                 for category in self.db.categories:
                     category_list.insert("end", "● " + category)
                     for subcategory in self.db.subcategories_map.get(category):
@@ -124,7 +127,7 @@ class GUI:
         add_category_entry.insert(0, "Unknown Category 0")
         add_category_entry.grid(row=row_no + 1, column=column_no, padx=15, pady=5)
         add_category_button = Button(root, text="Add new (sub)category", font=self.FONT,
-                                     command=lambda: add_category(add_category_entry, category_list))
+                                     command=lambda: add_category(add_category_entry, category_list), bg="light grey")
         add_category_button.grid(row=row_no + 2, column=column_no, padx=50)
 
     def create_expert_part(self, root, column_no, row_no):
@@ -132,7 +135,7 @@ class GUI:
         for category in self.db.experts:
             expert_list.insert("end", "● " + category + "\n")
         expert_list.config(state=DISABLED)
-        expert_list.grid(row=row_no + 3, sticky=N, column=column_no, padx=15, pady=5)
+        expert_list.grid(row=row_no + 3, sticky=N, column=column_no, rowspan=3, padx=15, pady=5)
 
         def add_expert(entry):
             if entry.get() in self.db.experts:
@@ -244,7 +247,7 @@ class GUI:
                             break
 
                     if finishing:
-                        showinfo(title='Comparing done', message="All pAirs for this category have been compared!\n"
+                        showinfo(title='Comparing done', message="All pairs for this category have been compared!\n"
                                                                  "Saving opinions.")
                         save()
                     else:
@@ -263,7 +266,6 @@ class GUI:
                         e2.insert(0, current_name2)
                         e2.config(state=DISABLED)
 
-                # TODO dodawanie do database
                 _next()
 
                 next_button = Button(frame, text="Next", font=self.FONT, command=_next)
@@ -292,128 +294,51 @@ class GUI:
         add_expert_entry.insert(0, "Unknown Expert 0")
         add_expert_entry.grid(row=row_no + 1, column=column_no, padx=15, pady=5)
         add_expert_button = Button(root, text="Add new expert", font=self.FONT,
-                                   command=lambda: add_expert(add_expert_entry))
+                                   command=lambda: add_expert(add_expert_entry), bg="light grey")
         add_expert_button.grid(row=row_no + 2, column=column_no, padx=50)
 
-    def create_preview_button(self, root, column_no, row_no):
+    def create_preview_button(self, root, column_no, row_no, row_span):
 
         def preview():
-            self.root.withdraw()
-            preview_window = Toplevel()
-            preview_window.title("Opinions")
-            preview_window.geometry("1600x900")
-            # "1024x576"
-            preview_window.resizable(False, False)
+            if not self.db.enough_data():
+                showinfo(title='Missing data', message="You need to type at least:\n2 Countries\n1 category\n1 expert.")
+            else:
+                self.root.withdraw()
+                preview_window = Toplevel()
+                preview_window.title("Opinions")
+                preview_window.geometry("1600x900")
+                # "1024x576"
+                preview_window.resizable(False, False)
 
-            frame = Frame(preview_window, bg="light grey", pady=10, padx=10)
-            frame.grid(row=0, column=0, rowspan=2, padx=15, pady=15)
+                frame = Frame(preview_window, bg="light grey", pady=10, padx=10)
+                frame.grid(row=0, column=0, rowspan=2, padx=15, pady=15)
 
-            preview_frame_bottom = Frame(preview_window, bg="light grey", padx=10)
-            preview_frame_bottom.grid(row=1, column=1, padx=5, pady=5)
+                preview_frame_bottom = Frame(preview_window, bg="light grey", padx=10)
+                preview_frame_bottom.grid(row=1, column=1, padx=5, pady=5)
 
-            preview_frame_top = Frame(preview_window, bg="light grey", padx=10)
-            preview_frame_top.grid(row=0, column=1, padx=5, pady=5)
+                preview_frame_top = Frame(preview_window, bg="light grey", padx=10)
+                preview_frame_top.grid(row=0, column=1, padx=5, pady=5)
 
-            missing_data = self.db.is_missing_data()
-
-            experts = self.db.experts
-            experts_listbox = Listbox(frame, listvariable=Variable(value=experts), height=len(experts))
-            experts_listbox.grid(row=0, column=0, padx=10, pady=10)
-
-            categories = self.db.categories
-            categories.insert(0, self.NO_CATEGORY)
-            categories_listbox = Listbox(frame, listvariable=Variable(value=categories), height=len(categories))
-            categories_listbox.grid(row=0, column=1, padx=10, pady=10)
-
-            subcategories = list(self.db.subcategories_map.values())
-            for sc in subcategories:
-                sc.insert(0, self.NO_SUBCATEGORY)
-
-            subcategories_listbox = Listbox(frame, listvariable=Variable(value=subcategories[0]),
-                                            height=len(subcategories[0]))
-            subcategories_listbox.grid(row=0, column=2, padx=10, pady=10)
-
-            expert_chosen = experts[0]
-
-            # for i in range(len(experts)):
-            for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
-                coloring = False
-                for expert, _ in missing_data:
-                    if expert_listbox == expert:
-                        coloring = True
-                if coloring:
-                    experts_listbox.itemconfig(i, {'bg': 'red'})
-                else:
-                    experts_listbox.itemconfig(i, {'bg': 'white'})
-
-            # for i in range(len(categories)):
-            for i, category_listbox in enumerate(categories_listbox.get(0, END)):
-                coloring = False
-                for expert, category in missing_data:
-                    if expert == expert_chosen:
-                        if self.db.subcategories_map.get(category_listbox) is not None:
-                            for subcategory in self.db.subcategories_map.get(category_listbox):
-                                if subcategory in category:
-                                    coloring = True
-                        if category_listbox in category:
-                            coloring = True
-                if coloring:
-                    categories_listbox.itemconfig(i, {'bg': 'red'})
-                else:
-                    categories_listbox.itemconfig(i, {'bg': 'white'})
-
-            # for i in range(len(subcategories[0])):
-            for i, subcategory_listbox in enumerate(subcategories_listbox.get(0, END)):
-                coloring = False
-                for expert, subcategory in missing_data:
-                    if expert == expert_chosen and subcategory_listbox in subcategory:
-                        coloring = True
-                if coloring:
-                    subcategories_listbox.itemconfig(i, {'bg': 'red'})
-                else:
-                    subcategories_listbox.itemconfig(i, {'bg': 'white'})
-
-            selected_experts = Label(frame, width=20, font=self.FONT)
-            selected_experts.grid(row=2, column=0, columnspan=3, padx=10, pady=1)
-            selected_categories = Label(frame, width=20, font=self.FONT)
-            selected_categories.grid(row=3, column=0, columnspan=3, padx=10, pady=1)
-            selected_subcategories = Label(frame, width=20, font=self.FONT)
-            selected_subcategories.grid(row=4, column=0, columnspan=3, padx=10, pady=1)
-
-            expert_chosen = ""
-            category_chosen = ""
-            subcategories_chosen = ""
-            chosen_options = False
-
-            def show_selected(event):
-                nonlocal expert_chosen, category_chosen, subcategories_chosen, chosen_options
                 missing_data = self.db.is_missing_data()
 
-                selected_indices = experts_listbox.curselection()
-                if len(selected_indices) > 0:
-                    expert_chosen = experts_listbox.get(selected_indices[0])
+                experts = self.db.experts
+                experts_listbox = Listbox(frame, listvariable=Variable(value=experts), height=len(experts))
+                experts_listbox.grid(row=0, column=0, padx=10, pady=10)
 
-                selected_indices = categories_listbox.curselection()
-                category_chosen_no = 0
-                if len(selected_indices) > 0:
-                    category_chosen_no = selected_indices[0]
-                    category_chosen = categories_listbox.get(selected_indices[0])
+                categories = self.db.categories
+                categories.insert(0, self.NO_CATEGORY)
+                categories_listbox = Listbox(frame, listvariable=Variable(value=categories), height=len(categories))
+                categories_listbox.grid(row=0, column=1, padx=10, pady=10)
 
-                    subcategories_listbox.delete(0, "end")
-                    if selected_indices[0] == 0:
-                        subcategories_listbox.insert("end", self.NO_SUBCATEGORY)
-                    elif subcategories[selected_indices[0] - 1] == "":
-                        subcategories_listbox.insert("end", category_chosen)
-                    else:
-                        for sub in subcategories[selected_indices[0] - 1]:
-                            subcategories_listbox.insert("end", sub)
+                subcategories = list(self.db.subcategories_map.values())
+                for sc in subcategories:
+                    sc.insert(0, self.NO_SUBCATEGORY)
 
-                selected_indices = subcategories_listbox.curselection()
-                if len(selected_indices) > 0:
-                    subcategories_chosen = subcategories_listbox.get(selected_indices[0])
+                subcategories_listbox = Listbox(frame, listvariable=Variable(value=subcategories[0]),
+                                                height=len(subcategories[0]))
+                subcategories_listbox.grid(row=0, column=2, padx=10, pady=10)
 
-                if expert_chosen != "" and category_chosen != "" and subcategories_chosen != "":
-                    chosen_options = True
+                expert_chosen = experts[0]
 
                 # for i in range(len(experts)):
                 for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
@@ -453,212 +378,330 @@ class GUI:
                     else:
                         subcategories_listbox.itemconfig(i, {'bg': 'white'})
 
-                selected_experts.config(text=expert_chosen)
-                selected_categories.config(text=category_chosen)
-                selected_subcategories.config(text=subcategories_chosen)
+                selected_experts = Label(frame, width=20, font=self.FONT)
+                selected_experts.grid(row=2, column=0, columnspan=3, padx=10, pady=1)
+                selected_categories = Label(frame, width=20, font=self.FONT)
+                selected_categories.grid(row=3, column=0, columnspan=3, padx=10, pady=1)
+                selected_subcategories = Label(frame, width=20, font=self.FONT)
+                selected_subcategories.grid(row=4, column=0, columnspan=3, padx=10, pady=1)
 
-            experts_listbox.bind('<<ListboxSelect>>', show_selected)
-            categories_listbox.bind('<<ListboxSelect>>', show_selected)
-            subcategories_listbox.bind('<<ListboxSelect>>', show_selected)
+                expert_chosen = ""
+                category_chosen = ""
+                subcategories_chosen = ""
+                chosen_options = False
 
-            def show_matrix():
-                def isfloat(num):
-                    try:
-                        float(num)
-                        return True
-                    except ValueError:
-                        return False
+                def show_selected(event):
+                    nonlocal expert_chosen, category_chosen, subcategories_chosen, chosen_options
+                    missing_data = self.db.is_missing_data()
 
-                if not chosen_options:
-                    showinfo(title='Missing data', message="First you need to choice all the options from lists!")
-                else:
-                    nonlocal expert_chosen, category_chosen, subcategories_chosen
-                    for widget in preview_frame_bottom.winfo_children():
-                        widget.destroy()
+                    selected_indices = experts_listbox.curselection()
+                    if len(selected_indices) > 0:
+                        expert_chosen = experts_listbox.get(selected_indices[0])
 
-                    key = subcategories_chosen
-                    labels = self.db.countries
-                    name = "Preview for " + str(expert_chosen) + ":\n"
-                    if category_chosen == self.NO_CATEGORY:
-                        key = "categories"
-                        labels = self.db.categories
-                        name += "categories' weights"
-                    else:
-                        if subcategories_chosen == self.NO_SUBCATEGORY:
-                            key = category_chosen
-                            name += str(category_chosen)
-                            if len(self.db.subcategories_map.get(category_chosen)) > 0:
-                                labels = list(self.db.subcategories_map.get(category_chosen))
-                                name += " weights"
+                    selected_indices = categories_listbox.curselection()
+                    category_chosen_no = 0
+                    if len(selected_indices) > 0:
+                        category_chosen_no = selected_indices[0]
+                        category_chosen = categories_listbox.get(selected_indices[0])
+
+                        subcategories_listbox.delete(0, "end")
+                        if selected_indices[0] == 0:
+                            subcategories_listbox.insert("end", self.NO_SUBCATEGORY)
+                        elif subcategories[selected_indices[0] - 1] == "":
+                            subcategories_listbox.insert("end", category_chosen)
                         else:
-                            name += str(subcategories_chosen) + " (" + str(category_chosen) + ")"
-                    matrix = self.db.get_matrix(key, expert_chosen)
-                    inconsistency_index = self.ahp.get_inconsistency_index(key, expert_chosen)
-                    if not isinstance(inconsistency_index, str):
-                        inconsistency_index = str(round(inconsistency_index, 5))
-                    name += "\nInconsistency Index: " + inconsistency_index
-                    Table(preview_frame_bottom, matrix, labels, preview_frame_top, name)
+                            for sub in subcategories[selected_indices[0] - 1]:
+                                subcategories_listbox.insert("end", sub)
 
-                    def save():
-                        values = []
-                        for widget in preview_frame_bottom.winfo_children():
-                            if isinstance(widget, Entry):
-                                values.append(widget.get())
+                    selected_indices = subcategories_listbox.curselection()
+                    if len(selected_indices) > 0:
+                        subcategories_chosen = subcategories_listbox.get(selected_indices[0])
 
-                        mod = len(labels)
-                        values = values[mod * 2:]
-                        for v in values:
-                            if not isfloat(v) or float(v) <= 0 or float(v) > 9:
-                                showinfo(title='Invalid data!', message="Values need to be float type in range [1/9,9]")
-                                return
+                    if expert_chosen != "" and category_chosen != "" and subcategories_chosen != "":
+                        chosen_options = True
 
-                        true_category = category_chosen
-                        if subcategories_chosen != self.NO_SUBCATEGORY:
-                            true_category = subcategories_chosen
-                        if true_category == self.NO_CATEGORY:
-                            true_category = "categories"
-                        for v in range(len(values)):
-                            if v // mod < v % mod:
-                                self.db.set_matrix_field(true_category, expert_chosen, v // mod, v % mod,
-                                                         float(values[v]))
+                    # for i in range(len(experts)):
+                    for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
+                        coloring = False
+                        for expert, _ in missing_data:
+                            if expert_listbox == expert:
+                                coloring = True
+                        if coloring:
+                            experts_listbox.itemconfig(i, {'bg': 'red'})
+                        else:
+                            experts_listbox.itemconfig(i, {'bg': 'white'})
 
-                        # TODO zapisywanie zmian
+                    # for i in range(len(categories)):
+                    for i, category_listbox in enumerate(categories_listbox.get(0, END)):
+                        coloring = False
+                        for expert, category in missing_data:
+                            if expert == expert_chosen:
+                                if self.db.subcategories_map.get(category_listbox) is not None:
+                                    for subcategory in self.db.subcategories_map.get(category_listbox):
+                                        if subcategory in category:
+                                            coloring = True
+                                if category_listbox in category:
+                                    coloring = True
+                        if coloring:
+                            categories_listbox.itemconfig(i, {'bg': 'red'})
+                        else:
+                            categories_listbox.itemconfig(i, {'bg': 'white'})
+
+                    # for i in range(len(subcategories[0])):
+                    for i, subcategory_listbox in enumerate(subcategories_listbox.get(0, END)):
+                        coloring = False
+                        for expert, subcategory in missing_data:
+                            if expert == expert_chosen and subcategory_listbox in subcategory:
+                                coloring = True
+                        if coloring:
+                            subcategories_listbox.itemconfig(i, {'bg': 'red'})
+                        else:
+                            subcategories_listbox.itemconfig(i, {'bg': 'white'})
+
+                    selected_experts.config(text=expert_chosen)
+                    selected_categories.config(text=category_chosen)
+                    selected_subcategories.config(text=subcategories_chosen)
+
+                experts_listbox.bind('<<ListboxSelect>>', show_selected)
+                categories_listbox.bind('<<ListboxSelect>>', show_selected)
+                subcategories_listbox.bind('<<ListboxSelect>>', show_selected)
+
+                def show_matrix():
+                    def isfloat(num):
+                        try:
+                            float(num)
+                            return True
+                        except ValueError:
+                            return False
+
+                    if not chosen_options:
+                        showinfo(title='Missing data', message="First you need to choice all the options from lists!")
+                    else:
+                        nonlocal expert_chosen, category_chosen, subcategories_chosen
                         for widget in preview_frame_bottom.winfo_children():
                             widget.destroy()
-                        pass
 
-                    save_button = Button(preview_frame_bottom, text="Save", font=self.FONT, command=save, width=10)
-                    save_button.grid(row=len(labels) + 1, columnspan=len(labels) + 1, pady=10, padx=10)
-
-            def add_opinion():
-                nonlocal expert_chosen, category_chosen, subcategories_chosen
-
-                def missing_data(expert_chosen, category_chosen, subcategories_chosen):
-                    for missing_expert, missing_categories in self.db.is_missing_data():
-                        if missing_expert == expert_chosen and (category_chosen in missing_categories or
-                                                                subcategories_chosen in missing_categories):
-                            return True
-                    return False
-
-                if not chosen_options:
-                    showinfo(title='Missing data', message="First you need to choice all the options from lists!")
-                elif not missing_data(expert_chosen, category_chosen, subcategories_chosen):
-                    showinfo(title='All opinions given',
-                             message="No need to add more opinions as all of them have been "
-                                     "already given.")
-                else:
-                    for widget in preview_frame_bottom.winfo_children():
-                        widget.destroy()
-
-                    names = self.db.countries
-                    label = ""
-
-                    if subcategories_chosen == self.NO_SUBCATEGORY:
-                        if len(self.db.subcategories_map.get(category_chosen)) > 0:
-                            names = list(self.db.subcategories_map.get(category_chosen))
-                            label = "Comparison " + expert_chosen + " for weights within " + category_chosen
+                        key = subcategories_chosen
+                        labels = self.db.countries
+                        name = "Preview for " + str(expert_chosen) + ":\n"
+                        if category_chosen == self.NO_CATEGORY:
+                            key = "categories"
+                            labels = self.db.categories
+                            name += "categories' weights"
                         else:
-                            label = "Comparison " + expert_chosen + " for " + category_chosen
-                    else:
-                        label = "Comparison " + expert_chosen + " for " + subcategories_chosen + " from " + category_chosen
+                            if subcategories_chosen == self.NO_SUBCATEGORY:
+                                key = category_chosen
+                                name += str(category_chosen)
+                                if len(self.db.subcategories_map.get(category_chosen)) > 0:
+                                    labels = list(self.db.subcategories_map.get(category_chosen))
+                                    name += " weights"
+                            else:
+                                name += str(subcategories_chosen) + " (" + str(category_chosen) + ")"
+                        matrix = self.db.get_matrix(key, expert_chosen)
+                        inconsistency_index = self.ahp.get_inconsistency_index(key, expert_chosen)
+                        if not isinstance(inconsistency_index, str):
+                            inconsistency_index = str(round(inconsistency_index, 5))
+                        name += "\nInconsistency Index: " + inconsistency_index
+                        Table(preview_frame_bottom, matrix, labels, preview_frame_top, name)
 
-                    idx = 0
-                    e_label = Entry(preview_frame_bottom, fg='black', font=self.FONT, width=50, justify=CENTER)
-                    e_label.grid(row=0, column=0, columnspan=4)
-                    e_label.config(state=DISABLED)
-                    e1 = Entry(preview_frame_bottom, fg='black', font=self.FONT, width=20, justify=CENTER)
-                    e1.grid(row=1, column=0)
-                    e1.config(state=DISABLED)
-                    s1 = Scale(preview_frame_bottom, from_=9, to=1, width=25)
-                    s1.grid(row=1, column=1, padx=5)
-                    s2 = Scale(preview_frame_bottom, from_=9, to=1, width=25)
-                    s2.grid(row=1, column=2, padx=5)
-                    e2 = Entry(preview_frame_bottom, fg='black', font=self.FONT, width=20, justify=CENTER)
-                    e2.grid(row=1, column=3)
-                    e2.config(state=DISABLED)
+                        def save():
+                            values = []
+                            for widget in preview_frame_bottom.winfo_children():
+                                if isinstance(widget, Entry):
+                                    values.append(widget.get())
 
-                    previous_idx1 = -1
-                    previous_idx2 = -1
+                            mod = len(labels)
+                            values = values[mod * 2:]
+                            for v in values:
+                                if not isfloat(v) or float(v) <= 0 or float(v) > 9:
+                                    showinfo(title='Invalid data!', message="Values need to be float type in range [1/9,9]")
+                                    return
 
-                    def _next():
-                        nonlocal idx, names, label, e_label, e1, e2, s1, s2, previous_idx1, previous_idx2, expert_chosen, \
-                            category_chosen, subcategories_chosen
-                        finishing = True
-                        _break = False
-
-                        if idx > 0:
                             true_category = category_chosen
                             if subcategories_chosen != self.NO_SUBCATEGORY:
                                 true_category = subcategories_chosen
-                            self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
-                                                     s1.get() / s2.get())
+                            if true_category == self.NO_CATEGORY:
+                                true_category = "categories"
+                            for v in range(len(values)):
+                                if v // mod < v % mod:
+                                    self.db.set_matrix_field(true_category, expert_chosen, v // mod, v % mod,
+                                                             float(values[v]))
 
-                        idx_copy = idx
-                        for idx1 in range(len(names)):
-                            for idx2 in range(idx1 + 1, len(names)):
-                                if idx_copy == 0:
-                                    idx += 1
-                                    finishing = False
-                                    current_name1 = names[idx1]
-                                    current_name2 = names[idx2]
-                                    previous_idx1 = idx1
-                                    previous_idx2 = idx2
-                                    _break = True
-                                if _break:
-                                    break
-                                idx_copy -= 1
-                            if _break:
-                                break
+                            for widget in preview_frame_bottom.winfo_children():
+                                widget.destroy()
 
-                        if finishing:
-                            showinfo(title='Comparing done', message="All pAirs for this category have been compared!\n"
-                                                                     "Saving opinions.")
-                            save()
-                        else:
-                            e_label.config(state=NORMAL)
-                            e_label.delete(0, "end")
-                            e_label.insert(0, label)
-                            e_label.config(state=DISABLED)
+                        save_button = Button(preview_frame_bottom, text="Save", font=self.FONT, command=save, width=10)
+                        save_button.grid(row=len(labels) + 1, columnspan=len(labels) + 1, pady=10, padx=10)
 
-                            e1.config(state=NORMAL)
-                            e1.delete(0, "end")
-                            e1.insert(0, current_name1)
-                            e1.config(state=DISABLED)
+                def add_opinion():
+                    nonlocal expert_chosen, category_chosen, subcategories_chosen
 
-                            e2.config(state=NORMAL)
-                            e2.delete(0, "end")
-                            e2.insert(0, current_name2)
-                            e2.config(state=DISABLED)
+                    def missing_data(expert_chosen, category_chosen, subcategories_chosen):
+                        for missing_expert, missing_categories in self.db.is_missing_data():
+                            if missing_expert == expert_chosen and (category_chosen in missing_categories or
+                                                                    subcategories_chosen in missing_categories):
+                                return True
+                        return False
 
-                    _next()
-
-                    next_button = Button(preview_frame_bottom, text="Next", font=self.FONT, command=_next)
-                    next_button.grid(row=2, column=0, columnspan=2, pady=10, padx=10)
-
-                    def save():
-                        # TODO zapisywanie zmian
+                    if not chosen_options:
+                        showinfo(title='Missing data', message="First you need to choice all the options from lists!")
+                    elif not missing_data(expert_chosen, category_chosen, subcategories_chosen):
+                        showinfo(title='All opinions given',
+                                 message="No need to add more opinions as all of them have been "
+                                         "already given.")
+                    else:
                         for widget in preview_frame_bottom.winfo_children():
                             widget.destroy()
-                        pass
 
-                    save_button = Button(preview_frame_bottom, text="Save", font=self.FONT, command=save)
-                    save_button.grid(row=2, column=2, columnspan=2, pady=10, padx=10)
+                        names = self.db.countries
+                        label = ""
 
-            matrix_button = Button(frame, text="Show matrix", font=self.FONT, command=show_matrix)
-            matrix_button.grid(row=5, column=0, pady=10, padx=10)
-            add_opinion_button = Button(frame, text="Edit expert's opinions", font=self.FONT, command=add_opinion)
-            add_opinion_button.grid(row=5, column=2, columnspan=2, pady=10, padx=10)
+                        if subcategories_chosen == self.NO_SUBCATEGORY:
+                            if len(self.db.subcategories_map.get(category_chosen)) > 0:
+                                names = list(self.db.subcategories_map.get(category_chosen))
+                                label = "Comparison " + expert_chosen + " for weights within " + category_chosen
+                            else:
+                                label = "Comparison " + expert_chosen + " for " + category_chosen
+                        else:
+                            label = "Comparison " + expert_chosen + " for " + subcategories_chosen + " from " + category_chosen
 
-            def _return():
-                self.root.deiconify()
-                preview_window.destroy()
+                        idx = 0
+                        e_label = Entry(preview_frame_bottom, fg='black', font=self.FONT, width=50, justify=CENTER)
+                        e_label.grid(row=0, column=0, columnspan=4)
+                        e_label.config(state=DISABLED)
+                        e1 = Entry(preview_frame_bottom, fg='black', font=self.FONT, width=20, justify=CENTER)
+                        e1.grid(row=1, column=0)
+                        e1.config(state=DISABLED)
+                        s1 = Scale(preview_frame_bottom, from_=9, to=1, width=25)
+                        s1.grid(row=1, column=1, padx=5)
+                        s2 = Scale(preview_frame_bottom, from_=9, to=1, width=25)
+                        s2.grid(row=1, column=2, padx=5)
+                        e2 = Entry(preview_frame_bottom, fg='black', font=self.FONT, width=20, justify=CENTER)
+                        e2.grid(row=1, column=3)
+                        e2.config(state=DISABLED)
 
-            return_button = Button(frame, text="Return", font=self.FONT, command=_return)
-            return_button.grid(sticky=S, columnspan=3, pady=10, padx=10)
+                        previous_idx1 = -1
+                        previous_idx2 = -1
+
+                        def _next():
+                            nonlocal idx, names, label, e_label, e1, e2, s1, s2, previous_idx1, previous_idx2, expert_chosen, \
+                                category_chosen, subcategories_chosen
+                            finishing = True
+                            _break = False
+
+                            if idx > 0:
+                                true_category = category_chosen
+                                if subcategories_chosen != self.NO_SUBCATEGORY:
+                                    true_category = subcategories_chosen
+                                self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
+                                                         s1.get() / s2.get())
+
+                            idx_copy = idx
+                            for idx1 in range(len(names)):
+                                for idx2 in range(idx1 + 1, len(names)):
+                                    if idx_copy == 0:
+                                        idx += 1
+                                        finishing = False
+                                        current_name1 = names[idx1]
+                                        current_name2 = names[idx2]
+                                        previous_idx1 = idx1
+                                        previous_idx2 = idx2
+                                        _break = True
+                                    if _break:
+                                        break
+                                    idx_copy -= 1
+                                if _break:
+                                    break
+
+                            if finishing:
+                                showinfo(title='Comparing done', message="All pAirs for this category have been compared!\n"
+                                                                         "Saving opinions.")
+                                save()
+                            else:
+                                e_label.config(state=NORMAL)
+                                e_label.delete(0, "end")
+                                e_label.insert(0, label)
+                                e_label.config(state=DISABLED)
+
+                                e1.config(state=NORMAL)
+                                e1.delete(0, "end")
+                                e1.insert(0, current_name1)
+                                e1.config(state=DISABLED)
+
+                                e2.config(state=NORMAL)
+                                e2.delete(0, "end")
+                                e2.insert(0, current_name2)
+                                e2.config(state=DISABLED)
+
+                        _next()
+
+                        next_button = Button(preview_frame_bottom, text="Next", font=self.FONT, command=_next)
+                        next_button.grid(row=2, column=0, columnspan=2, pady=10, padx=10)
+
+                        def save():
+                            # TODO zapisywanie zmian
+                            for widget in preview_frame_bottom.winfo_children():
+                                widget.destroy()
+                            pass
+
+                        save_button = Button(preview_frame_bottom, text="Save", font=self.FONT, command=save)
+                        save_button.grid(row=2, column=2, columnspan=2, pady=10, padx=10)
+
+                matrix_button = Button(frame, text="Show matrix", font=self.FONT, command=show_matrix)
+                matrix_button.grid(row=5, column=0, pady=10, padx=10)
+                add_opinion_button = Button(frame, text="Fill missing opinions", font=self.FONT, command=add_opinion)
+                add_opinion_button.grid(row=5, column=2, columnspan=2, pady=10, padx=10)
+
+                def _return():
+                    self.root.deiconify()
+                    preview_window.destroy()
+
+                return_button = Button(frame, text="Return", font=self.FONT, command=_return)
+                return_button.grid(sticky=S, columnspan=3, pady=10, padx=10)
 
         preview_button = Button(root, text="Show\nexperts'\nopinions", font=self.FONT, command=preview, width=14,
-                                height=7)
-        preview_button.grid(column=column_no, row=0, rowspan=row_no, pady=10, padx=10)
+                                height=7, bg="light grey")
+        preview_button.grid(column=column_no, row=row_no, rowspan=row_span, pady=10, padx=10)
+
+    def create_save_button(self, root, column_no, row_no):
+        def _save():
+            if not self.db.enough_data():
+                showinfo(title='Missing data', message="You need to type at least:\n2 Countries\n1 category\n1 expert.")
+            else:
+                self.db.save()
+
+        add_save_button = Button(root, text="Save data", font=self.FONT, command=_save, width=14,
+                                 height=4, bg="light grey")
+        add_save_button.grid(row=row_no, column=column_no)
+
+    def create_load_button(self, root, column_no, row_no):
+        def _load():
+            self.db = self.db.load()
+            self.refresh()
+
+        add_load_button = Button(root, text="Load data", font=self.FONT, command=_load, width=14,
+                                 height=4, bg="light grey")
+        add_load_button.grid(row=row_no, column=column_no)
+
+    def create_clear_all_button(self, root, column_no, row_no):
+        def clear():
+            for expert in self.db.experts:
+                self.db.remove_expert(expert)
+            for country in self.db.countries:
+                self.db.remove_country(country)
+            for category in self.db.subcategories_map:
+                for subcategory in self.db.subcategories_map[category]:
+                    self.db.remove_subcategory(category, subcategory)
+            for category in self.db.categories:
+                self.db.remove_category(category)
+                
+            self.refresh()
+
+            self.db.load()
+
+        add_clear_all_button = Button(root, text="Clear all data", font=self.FONT, command=clear, width=14,
+                                 height=4, bg="light grey")
+        add_clear_all_button.grid(row=row_no, column=column_no)
 
     def create_solve_button(self, root, column_no, row_no):
 
@@ -727,3 +770,23 @@ class GUI:
         buttonSolve = Button(root, text="Solve", font=("Arial", 26), command=solve, bg="blue", fg="pink",
                              width=40)
         buttonSolve.grid(row=row_no, sticky=N, columnspan=3, pady=10, padx=10)
+        
+    def refresh(self):
+        for widget in self.main_window.winfo_children():
+            widget.destroy()
+
+        # self.ahp = AHP(self.db)
+
+        self.country_no = 0
+        self.category_no = 0
+        self.expert_no = 0
+
+        self.create_country_part(self.main_window, 0, 1)
+        self.create_category_part(self.main_window, 1, 1)
+        self.create_expert_part(self.main_window, 2, 1)
+        self.create_preview_button(self.main_window, 3, 0, 4)
+        self.create_save_button(self.main_window, 3, 4)
+        self.create_load_button(self.main_window, 3, 5)
+        self.create_clear_all_button(self.main_window, 3, 6)
+        self.create_solve_button(self.main_window, 3, 0)
+        pass
