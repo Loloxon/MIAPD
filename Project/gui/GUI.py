@@ -51,7 +51,6 @@ class GUI:
                 country_list.config(state=NORMAL)
                 country_list.insert("end", "● " + entry.get() + "\n")
                 country_list.config(state=DISABLED)
-            self.db.generate_matrices()
             self.country_no += 1
             entry.delete(0, "end")
             entry.insert(0, "Unknown Country " + str(self.country_no))
@@ -92,9 +91,15 @@ class GUI:
                     chosen_category = chosen_category[2:]
                 else:
                     chosen_category = chosen_category[5:]
-#TODO wykrywanie rowniez z podkryteriow a nie tylko kryteriow
+            subcategory_already_exists = False
+            for sub_categories in self.db.subcategories_map.values():
+                if entry.get() in sub_categories:
+                    subcategory_already_exists = True
+                    break
             if entry.get() in self.db.categories:
-                showinfo(title='Invalid name!', message="Given category already exists in the database!")
+                showinfo(title='Invalid name!', message="Given category already exists in the category database!")
+            elif subcategory_already_exists:
+                showinfo(title='Invalid name!', message="Given category already exists in the subcategory database!")
             elif chosen_category != "" and chosen_category not in self.db.subcategories_map.keys():
                 showinfo(title='Invalid subcategory!', message="You can't chose subcategory!\nYou need to chose "
                                                                "normal category or none (by clicking outside of the "
@@ -102,10 +107,13 @@ class GUI:
             else:
                 if chosen_category == "":
                     self.db.add_category(entry.get())
-                    category_list.insert("end", "● " + entry.get())
                 else:
                     self.db.add_subcategory(chosen_category, entry.get())
-                    category_list.insert("end", "   - " + entry.get())
+                category_list.delete(0,END)
+                for category in self.db.categories:
+                    category_list.insert("end", "● " + category)
+                    for subcategory in self.db.subcategories_map.get(category):
+                        category_list.insert("end", "   - " + subcategory)
                 self.category_no += 1
                 entry.delete(0, "end")
                 entry.insert(0, "Unknown Category " + str(self.category_no))
