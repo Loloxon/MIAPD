@@ -38,7 +38,8 @@ class AHP:
             weight = 0
             for cat, subcategories in subcategories_map.items():
                 if not subcategories:
-                    weight += self._priority_vectors[cat][i]*self._priority_vectors['categories'][categories.index(cat)]
+                    weight += self._priority_vectors[cat][i] * self._priority_vectors['categories'][
+                        categories.index(cat)]
                     continue
                 partial_weight = 0
                 for j, sub in enumerate(subcategories):
@@ -60,6 +61,6 @@ class AHP:
         return index
 
 
-def koczkodaj_index(matrix: np.array, i: int, j: int ,k: int) -> float:
-    return min(abs(1-matrix[i][j]*matrix[j][k]/matrix[i][k]), abs(1-matrix[i][k]/(matrix[i][j] * matrix[j][k])))
-
+def koczkodaj_index(matrix: np.array, i: int, j: int, k: int) -> float:
+    return min(abs(1 - matrix[i][j] * matrix[j][k] / matrix[i][k]),
+               abs(1 - matrix[i][k] / (matrix[i][j] * matrix[j][k])))
