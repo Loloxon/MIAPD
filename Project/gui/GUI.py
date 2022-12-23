@@ -150,7 +150,6 @@ class GUI:
                 new_expert_window = Toplevel()
                 new_expert_window.title("Opinions")
                 new_expert_window.geometry("860x480")
-                # "1024x576"
                 new_expert_window.resizable(False, False)
 
                 frame = Frame(new_expert_window, bg="light grey", pady=10, padx=10)
@@ -163,11 +162,8 @@ class GUI:
                         for subcategory in self.db.subcategories_map.get(category):
                             sub.append([category, subcategory])
                         sub.append([category, category])
-                        # przechodze przez wszystkie podkategorie i porownuje kraje
-                        # na koncu powordnuje podkategorie
                     else:
                         sub.append([category])
-                        # porownuje kraje
 
                 labels = ["categories"]
                 names = [self.db.categories]
@@ -178,17 +174,14 @@ class GUI:
                             labels.append("Comparison for " + str(s[1]) + " from " + str(s[0]))
                             names.append(countries)
                             categories.append(str(s[1]))
-                            # #dla s[0] _ s[1]
                         else:
                             labels.append("Comparison for weights within " + str(s[0]))
                             names.append(self.db.subcategories_map.get(s[0]))
                             categories.append(str(s[0]))
-                            # #dla s[0] wagi podkategorii
                     else:
                         labels.append("Comparison for " + str(s[0]))
                         names.append(countries)
                         categories.append(str(s[0]))
-                        # # dla s[0]
 
                 idx = 0
                 e_label = Entry(frame, fg='black', font=self.FONT, width=50, justify=CENTER)
@@ -276,7 +269,6 @@ class GUI:
                         self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
                                                  s2.get() / s1.get())
 
-                    # TODO zapisywanie zmian
                     self.root.deiconify()
                     new_expert_window.destroy()
                     pass
@@ -307,7 +299,6 @@ class GUI:
                 preview_window = Toplevel()
                 preview_window.title("Opinions")
                 preview_window.geometry("1600x900")
-                # "1024x576"
                 preview_window.resizable(False, False)
 
                 frame = Frame(preview_window, bg="light grey", pady=10, padx=10)
@@ -331,16 +322,14 @@ class GUI:
                 categories_listbox.grid(row=0, column=1, padx=10, pady=10)
 
                 subcategories = list(self.db.subcategories_map.values())
+                subcategories.insert(0, [])
                 for sc in subcategories:
                     sc.insert(0, self.NO_SUBCATEGORY)
 
-                subcategories_listbox = Listbox(frame, listvariable=Variable(value=subcategories[0]),
-                                                height=len(subcategories[0]))
+                subcategories_listbox = Listbox(frame, listvariable=Variable(value=subcategories[0]), height=len(max(subcategories, key=len)))
                 subcategories_listbox.grid(row=0, column=2, padx=10, pady=10)
 
-                expert_chosen = experts[0]
 
-                # for i in range(len(experts)):
                 for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
                     coloring = False
                     for expert, _ in missing_data:
@@ -351,32 +340,14 @@ class GUI:
                     else:
                         experts_listbox.itemconfig(i, {'bg': 'white'})
 
-                # for i in range(len(categories)):
-                for i, category_listbox in enumerate(categories_listbox.get(0, END)):
-                    coloring = False
-                    for expert, category in missing_data:
-                        if expert == expert_chosen:
-                            if self.db.subcategories_map.get(category_listbox) is not None:
-                                for subcategory in self.db.subcategories_map.get(category_listbox):
-                                    if subcategory in category:
-                                        coloring = True
-                            if category_listbox in category:
-                                coloring = True
-                    if coloring:
-                        categories_listbox.itemconfig(i, {'bg': 'red'})
+                for expert, category in missing_data:
+                    if expert == experts[0] and 'categories' in category:
+                        categories_listbox.itemconfig(0, {'bg': 'red'})
+                        subcategories_listbox.itemconfig(0, {'bg': 'red'})
                     else:
-                        categories_listbox.itemconfig(i, {'bg': 'white'})
+                        categories_listbox.itemconfig(0, {'bg': 'white'})
+                        subcategories_listbox.itemconfig(0, {'bg': 'white'})
 
-                # for i in range(len(subcategories[0])):
-                for i, subcategory_listbox in enumerate(subcategories_listbox.get(0, END)):
-                    coloring = False
-                    for expert, subcategory in missing_data:
-                        if expert == expert_chosen and subcategory_listbox in subcategory:
-                            coloring = True
-                    if coloring:
-                        subcategories_listbox.itemconfig(i, {'bg': 'red'})
-                    else:
-                        subcategories_listbox.itemconfig(i, {'bg': 'white'})
 
                 selected_experts = Label(frame, width=20, font=self.FONT)
                 selected_experts.grid(row=2, column=0, columnspan=3, padx=10, pady=1)
@@ -393,24 +364,19 @@ class GUI:
                 def show_selected(event):
                     nonlocal expert_chosen, category_chosen, subcategories_chosen, chosen_options
                     missing_data = self.db.is_missing_data()
-
                     selected_indices = experts_listbox.curselection()
                     if len(selected_indices) > 0:
                         expert_chosen = experts_listbox.get(selected_indices[0])
 
                     selected_indices = categories_listbox.curselection()
-                    category_chosen_no = 0
                     if len(selected_indices) > 0:
-                        category_chosen_no = selected_indices[0]
                         category_chosen = categories_listbox.get(selected_indices[0])
 
                         subcategories_listbox.delete(0, "end")
                         if selected_indices[0] == 0:
                             subcategories_listbox.insert("end", self.NO_SUBCATEGORY)
-                        elif subcategories[selected_indices[0] - 1] == "":
-                            subcategories_listbox.insert("end", category_chosen)
                         else:
-                            for sub in subcategories[selected_indices[0] - 1]:
+                            for sub in subcategories[selected_indices[0]]:
                                 subcategories_listbox.insert("end", sub)
 
                     selected_indices = subcategories_listbox.curselection()
@@ -420,7 +386,6 @@ class GUI:
                     if expert_chosen != "" and category_chosen != "" and subcategories_chosen != "":
                         chosen_options = True
 
-                    # for i in range(len(experts)):
                     for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
                         coloring = False
                         for expert, _ in missing_data:
@@ -431,7 +396,7 @@ class GUI:
                         else:
                             experts_listbox.itemconfig(i, {'bg': 'white'})
 
-                    # for i in range(len(categories)):
+                    subcoloring = False
                     for i, category_listbox in enumerate(categories_listbox.get(0, END)):
                         coloring = False
                         for expert, category in missing_data:
@@ -442,18 +407,24 @@ class GUI:
                                             coloring = True
                                 if category_listbox in category:
                                     coloring = True
+                                if category_listbox == self.NO_CATEGORY and 'categories' in category:
+                                    coloring = True
+                                    subcoloring = True
                         if coloring:
                             categories_listbox.itemconfig(i, {'bg': 'red'})
                         else:
                             categories_listbox.itemconfig(i, {'bg': 'white'})
 
-                    # for i in range(len(subcategories[0])):
                     for i, subcategory_listbox in enumerate(subcategories_listbox.get(0, END)):
                         coloring = False
                         for expert, subcategory in missing_data:
-                            if expert == expert_chosen and subcategory_listbox in subcategory:
-                                coloring = True
-                        if coloring:
+                            if expert == expert_chosen:
+                                if subcategory_listbox in subcategory:
+                                    coloring = True
+                                for category in subcategory:
+                                    if category in self.db.subcategories_map and subcategory_listbox in self.NO_SUBCATEGORY and category_chosen == category:
+                                        coloring = True
+                        if coloring or subcoloring:
                             subcategories_listbox.itemconfig(i, {'bg': 'red'})
                         else:
                             subcategories_listbox.itemconfig(i, {'bg': 'white'})
@@ -540,8 +511,6 @@ class GUI:
                     def missing_data(expert_chosen, category_chosen, subcategories_chosen):
                         if category_chosen == "<no category>":
                             category_chosen = "categories"
-                        print(expert_chosen, category_chosen, subcategories_chosen)
-                        print(self.db.is_missing_data())
                         for missing_expert, missing_categories in self.db.is_missing_data():
                             if missing_expert == expert_chosen and (category_chosen in missing_categories or
                                                                     subcategories_chosen in missing_categories
@@ -608,7 +577,6 @@ class GUI:
 
                             for idx1 in range(len(names)):
                                 for idx2 in range(idx1 + 1, len(names)):
-                                    print(self.db.get_matrix(true_category, expert_chosen)[idx2][idx1])
                                     if self.db.get_matrix(true_category, expert_chosen)[idx2][idx1] == 0.0:
                                         idx += 1
                                         finishing = False
@@ -650,7 +618,6 @@ class GUI:
                             if idx > 0:
                                 self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
                                                          s2.get() / s1.get())
-                            # TODO zapisywanie zmian
                             for widget in preview_frame_bottom.winfo_children():
                                 widget.destroy()
                             pass
@@ -723,7 +690,7 @@ class GUI:
             else:
                 results = Toplevel()
                 results.title("Ranking")
-                results.geometry("1170x900")  # "1024x576"
+                results.geometry("1170x900")
                 results.resizable(False, False)
 
                 canvas = Canvas(results)
@@ -747,13 +714,11 @@ class GUI:
                 ranking = []
                 for i in range(len(rank[0])):
                     ranking.append((rank[0][i], rank[1][i]))
-                # TODO ewentualnie jakieś bajery do wyświetlania
                 top = ranking[0][1]
                 multi = 100 / top
                 label_tmp = Label(scrollable_frame, text="Which country is best\nto declare war on?",
                                   font=("Arial", 50, "bold"))
                 label_tmp.grid(column=0, sticky=S, pady=10, padx=10)
-                # labels.append(label_tmp)
                 for idx, country in enumerate(ranking):
                     if idx == 0:
                         label_tmp = Label(scrollable_frame,
@@ -776,7 +741,6 @@ class GUI:
                                           font=("Arial", round(country[1] * multi)), justify=RIGHT, bg="#AAA")
                     label_tmp.grid(sticky=S, pady=10, padx=10)
                     label_tmp.config(justify=RIGHT)
-                    # labels.append(label_tmp)
 
         buttonSolve = Button(root, text="Solve", font=("Arial", 26), command=solve, bg="blue", fg="pink",
                              width=40)
@@ -785,8 +749,6 @@ class GUI:
     def refresh(self):
         for widget in self.main_window.winfo_children():
             widget.destroy()
-
-        # self.ahp = AHP(self.db)
 
         self.country_no = 0
         self.category_no = 0
