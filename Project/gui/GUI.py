@@ -260,8 +260,6 @@ class GUI:
 
                 def save():
                     if idx > 0:
-                        print(true_category, expert_chosen, previous_idx2, previous_idx1,
-                              s2.get() / s1.get())
                         self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
                                                  s2.get() / s1.get())
 
@@ -336,9 +334,7 @@ class GUI:
                     else:
                         experts_listbox.itemconfig(i, {'bg': 'white'})
 
-                print(missing_data)
                 for i, category_listbox in enumerate(categories_listbox.get(0, END)):
-                    print(i, category_listbox)
                     for expert, category in missing_data:
                         if expert == experts[0]:
                             if category_listbox == self.NO_CATEGORY and 'categories' in category:
