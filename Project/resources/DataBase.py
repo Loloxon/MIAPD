@@ -24,7 +24,12 @@ class DataBase:
     def add_expert(self, name: str) -> None:
         self._experts.append(name)
         for category, matrices in self._matrices.items():
-            matrices.append(np.identity(len(self._countries), dtype=np.float64))
+            if category=="categories":
+                matrices.append(np.identity(len(self._categories), dtype=np.float64))
+            elif category in self._subcategories_map.keys() and len(self._subcategories_map[category])>0:
+                matrices.append(np.identity(len(self._subcategories_map[category]), dtype=np.float64))
+            else:
+                matrices.append(np.identity(len(self._countries), dtype=np.float64))
 
     def add_country(self, name: str) -> None:
         self._countries.append(name)

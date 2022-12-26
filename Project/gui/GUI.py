@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter.messagebox import showinfo
 from tkinter.scrolledtext import ScrolledText
 
+import numpy as np
+
 from Project.backend.AHP import AHP
 from Project.gui.Table import Table
 
@@ -12,6 +14,9 @@ class GUI:
         self.LABEL_FONT = ("Arial", 15)
         self.NO_SUBCATEGORY = "<no subcategory>"
         self.NO_CATEGORY = "<no category>"
+        self.country_no = 0
+        self.category_no = 0
+        self.expert_no = 0
 
         self.root = Tk()
         self.root.title("Comparing App")
@@ -24,18 +29,7 @@ class GUI:
         self.db = data_base
         self.ahp = AHP(self.db)
 
-        self.country_no = 0
-        self.category_no = 0
-        self.expert_no = 0
-
-        self.create_country_part(self.main_window, 0, 1)
-        self.create_category_part(self.main_window, 1, 1)
-        self.create_expert_part(self.main_window, 2, 1)
-        self.create_preview_button(self.main_window, 3, 0, 4)
-        self.create_save_button(self.main_window, 3, 4)
-        self.create_load_button(self.main_window, 3, 5)
-        self.create_clear_all_button(self.main_window, 3, 6)
-        self.create_solve_button(self.main_window, 3, 0)
+        self.refresh()
 
         self.main_window.mainloop()
 
@@ -44,7 +38,7 @@ class GUI:
         for country in self.db.countries:
             country_list.insert("end", "● " + country + "\n")
         country_list.config(state=DISABLED)
-        country_list.grid(row=row_no + 3, sticky=N, column=column_no, rowspan=3, padx=15, pady=5)
+        country_list.grid(row=row_no + 3, sticky=N, column=column_no, rowspan=4, padx=15, pady=5)
 
         def add_country(entry):
             if entry.get() in self.db.countries:
@@ -83,7 +77,7 @@ class GUI:
             category_list.insert("end", "● " + category)
             for subcategory in self.db.subcategories_map.get(category):
                 category_list.insert("end", "   - " + subcategory)
-        category_list.grid(row=row_no + 3, sticky=N, column=column_no, rowspan=3, padx=15, pady=5)
+        category_list.grid(row=row_no + 3, sticky=N, column=column_no, rowspan=4, padx=15, pady=5)
 
         def add_category(entry, listbox):
             selected_indices = listbox.curselection()
@@ -135,7 +129,7 @@ class GUI:
         for category in self.db.experts:
             expert_list.insert("end", "● " + category + "\n")
         expert_list.config(state=DISABLED)
-        expert_list.grid(row=row_no + 3, sticky=N, column=column_no, rowspan=3, padx=15, pady=5)
+        expert_list.grid(row=row_no + 3, sticky=N, column=column_no, rowspan=4, padx=15, pady=5)
 
         def add_expert(entry):
             if entry.get() in self.db.experts:
@@ -201,7 +195,7 @@ class GUI:
                 previous_idx1 = -1
                 previous_idx2 = -1
 
-                expert_chosen = "idk"
+                expert_chosen = entry.get()
                 true_category = "idk"
 
                 def _next():
@@ -225,7 +219,7 @@ class GUI:
                                     current_name2 = names[index][idx2]
                                     current_label = label
 
-                                    expert_chosen = entry.get()
+                                    # expert_chosen = entry.get()
                                     true_category = categories[index]
 
                                     previous_idx1 = idx1
@@ -266,6 +260,8 @@ class GUI:
 
                 def save():
                     if idx > 0:
+                        print(true_category, expert_chosen, previous_idx2, previous_idx1,
+                              s2.get() / s1.get())
                         self.db.set_matrix_field(true_category, expert_chosen, previous_idx2, previous_idx1,
                                                  s2.get() / s1.get())
 
@@ -326,9 +322,9 @@ class GUI:
                 for sc in subcategories:
                     sc.insert(0, self.NO_SUBCATEGORY)
 
-                subcategories_listbox = Listbox(frame, listvariable=Variable(value=subcategories[0]), height=len(max(subcategories, key=len)))
+                subcategories_listbox = Listbox(frame, listvariable=Variable(value=subcategories[0]),
+                                                height=len(max(subcategories, key=len)))
                 subcategories_listbox.grid(row=0, column=2, padx=10, pady=10)
-
 
                 for i, expert_listbox in enumerate(experts_listbox.get(0, END)):
                     coloring = False
@@ -340,14 +336,19 @@ class GUI:
                     else:
                         experts_listbox.itemconfig(i, {'bg': 'white'})
 
-                for expert, category in missing_data:
-                    if expert == experts[0] and 'categories' in category:
-                        categories_listbox.itemconfig(0, {'bg': 'red'})
-                        subcategories_listbox.itemconfig(0, {'bg': 'red'})
-                    else:
-                        categories_listbox.itemconfig(0, {'bg': 'white'})
-                        subcategories_listbox.itemconfig(0, {'bg': 'white'})
-
+                print(missing_data)
+                for i, category_listbox in enumerate(categories_listbox.get(0, END)):
+                    print(i, category_listbox)
+                    for expert, category in missing_data:
+                        if expert == experts[0]:
+                            if category_listbox == self.NO_CATEGORY and 'categories' in category:
+                                categories_listbox.itemconfig(0, {'bg': 'red'})
+                                subcategories_listbox.itemconfig(0, {'bg': 'red'})
+                            elif category_listbox in category:
+                                categories_listbox.itemconfig(i, {'bg': 'red'})
+                        else:
+                            categories_listbox.itemconfig(0, {'bg': 'white'})
+                            subcategories_listbox.itemconfig(0, {'bg': 'white'})
 
                 selected_experts = Label(frame, width=20, font=self.FONT)
                 selected_experts.grid(row=2, column=0, columnspan=3, padx=10, pady=1)
@@ -409,7 +410,8 @@ class GUI:
                                     coloring = True
                                 if category_listbox == self.NO_CATEGORY and 'categories' in category:
                                     coloring = True
-                                    subcoloring = True
+                                    if selected_categories == category_listbox:
+                                        subcoloring = True
                         if coloring:
                             categories_listbox.itemconfig(i, {'bg': 'red'})
                         else:
@@ -658,8 +660,154 @@ class GUI:
             self.refresh()
 
         add_load_button = Button(root, text="Load data", font=self.FONT, command=_load, width=14,
-                                 height=4, bg="light grey")
+                                 height=3, bg="light grey")
         add_load_button.grid(row=row_no, column=column_no)
+
+    def create_init_load_button(self, root, column_no, row_no):
+        def _load():
+            for expert in self.db.experts:
+                self.db.remove_expert(expert)
+            for country in self.db.countries:
+                self.db.remove_country(country)
+            for category in self.db.subcategories_map:
+                for subcategory in self.db.subcategories_map[category]:
+                    self.db.remove_subcategory(category, subcategory)
+            for category in self.db.categories:
+                self.db.remove_category(category)
+
+            self.db.add_expert('Bob, The Expert')
+            self.db.add_country('USA')
+            self.db.add_country('Russia')
+            self.db.add_country('Germany')
+            self.db.add_country('Japan')
+
+            self.db.add_category('Army')
+            self.db.add_subcategory('Army', 'Navy')
+            self.db.add_subcategory('Army', 'Ground Forces')
+            self.db.add_subcategory('Army', 'Air Forces')
+            self.db.add_category('Distance')
+            self.db.add_category('Potential Allies')
+            self.db.add_category('Economy')
+            self.db.add_subcategory('Economy', 'Current')
+            self.db.add_subcategory('Economy', 'Predictions')
+            self.db.add_category('Political Relationships')
+
+            array = np.array([[1, 7, 8],
+                              [1 / 7, 1, 3],
+                              [1 / 8, 1 / 3, 1]])
+            matrix = "Army"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array(
+                [[1, 7 / 5, 4 / 9, 4 / 5],
+                 [5 / 7, 1, 6 / 7, 7 / 6],
+                 [9 / 4, 7 / 6, 1, 3 / 2],
+                 [5 / 4, 6 / 7, 2 / 3, 1]])
+            matrix = "Navy"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array([[1, 7 / 3, 9 / 5, 2],
+                              [3 / 7, 1, 8 / 5, 8 / 5],
+                              [5 / 9, 5 / 8, 1, 2],
+                              [1 / 2, 5 / 8, 1 / 2, 1]])
+            matrix = "Ground Forces"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array(
+                [[1, 7 / 5, 4 / 3, 5 / 9],
+                 [5 / 7, 1, 2, 6 / 5],
+                 [3 / 4, 1 / 2, 1, 3 / 2],
+                 [9 / 5, 5 / 6, 2 / 3, 1]])
+            matrix = "Air Forces"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array([[1, 2 / 5, 1 / 9, 1 / 7],
+                              [2 / 5, 1, 1 / 9, 1 / 4],
+                              [9, 9, 1, 5],
+                              [7, 4, 1 / 5, 1]])
+            matrix = "Distance"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array([[1, 1 / 9, 1 / 9, 1 / 9],
+                              [9, 1, 5, 9 / 8],
+                              [9, 1 / 5, 1, 7 / 9],
+                              [9, 8 / 9, 9 / 7, 1]])
+            matrix = "Potential Allies"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array([[1, 3],
+                              [1 / 3, 1]])
+            matrix = "Economy"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array(
+                [[1, 6 / 5, 2 / 3, 5 / 2],
+                 [5 / 6, 1, 5 / 9, 7 / 5],
+                 [3 / 2, 9 / 5, 1, 1],
+                 [2 / 5, 5 / 7, 1, 1]])
+            matrix = "Current"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array([[1, 9, 9, 3 / 8],
+                              [1 / 9, 1, 2 / 3, 1 / 9],
+                              [1 / 9, 3 / 2, 1, 1 / 9],
+                              [8 / 3, 9, 9, 1]])
+            matrix = "Predictions"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array([[1, 9, 4 / 3, 7 / 5],
+                              [1 / 9, 1, 1 / 9, 1 / 9],
+                              [3 / 4, 9, 1, 1 / 2],
+                              [5 / 7, 9, 2, 1]])
+            matrix = "Political Relationships"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            array = np.array([[1, 7 / 5, 5, 9 / 5, 8],
+                              [5 / 7, 1, 9 / 5, 7 / 5, 5 / 4],
+                              [1 / 5, 5 / 9, 1, 3 / 7, 3 / 4],
+                              [5 / 9, 5 / 7, 7 / 3, 1, 7 / 9],
+                              [1 / 8, 4 / 5, 4 / 3, 9 / 7, 1]])
+            matrix = "categories"
+            expert = "Bob, The Expert"
+            for i in range(len(array)):
+                for j in range(len(array[0])):
+                    self.db.set_matrix_field(matrix, expert, i, j, array[i][j])
+
+            self.refresh()
+
+        add_load_button = Button(root, text="Load default data", font=self.FONT, command=_load, width=14,
+                                 height=1, bg="light grey")
+        add_load_button.grid(row=row_no, column=column_no, sticky=N)
 
     def create_clear_all_button(self, root, column_no, row_no):
         def clear():
@@ -674,8 +822,6 @@ class GUI:
                 self.db.remove_category(category)
 
             self.refresh()
-
-            self.db.load()
 
         add_clear_all_button = Button(root, text="Clear all data", font=self.FONT, command=clear, width=14,
                                       height=4, bg="light grey")
@@ -760,6 +906,6 @@ class GUI:
         self.create_preview_button(self.main_window, 3, 0, 4)
         self.create_save_button(self.main_window, 3, 4)
         self.create_load_button(self.main_window, 3, 5)
-        self.create_clear_all_button(self.main_window, 3, 6)
+        self.create_init_load_button(self.main_window, 3, 6)
+        self.create_clear_all_button(self.main_window, 3, 7)
         self.create_solve_button(self.main_window, 3, 0)
-        pass
