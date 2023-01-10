@@ -7,11 +7,6 @@ from typing import Dict, List, Union, Tuple
 import numpy as np
 
 
-# Kolejność robienia rzeczy
-# 1. Załadowanie nazw kategorii, krajów i ekspertów z pliku
-# 2. Ewentualne dodanie nowych danych przez użytkownika i usunięcie starych
-# 3. Wygenerowanie macierzy i wpisanie do nich danych
-
 class DataBase:
     def __init__(self):
         self._subcategories_map: Dict[str, List[str]] = dict()
