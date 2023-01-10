@@ -827,62 +827,63 @@ class GUI:
 
         def solve():
             if self.db.is_missing_data():
-                showinfo(title='Missing data', message="First you need fill all the necessary opinions!\n"
-                                                       "You can do it in \"Show experts' opinions\" section.")
-            else:
-                results = Toplevel()
-                results.title("Ranking")
-                results.geometry("1170x900")
-                results.resizable(False, False)
+                showinfo(title='Missing data', message="The are some missing data! Ranking will be calculated on "
+                                                       "predicated values, if you want it to be calculated on real "
+                                                       "values you can do it in \"Show experts' opinions\" section.")
+            # else:
+            results = Toplevel()
+            results.title("Ranking")
+            results.geometry("1170x900")
+            results.resizable(False, False)
 
-                canvas = Canvas(results)
-                scrollbar = Scrollbar(results, orient="vertical", command=canvas.yview, width=20)
-                scrollable_frame = Frame(canvas, padx=30, pady=30)
-                scrollable_frame.bind(
-                    "<Configure>",
-                    lambda e: canvas.configure(
-                        scrollregion=canvas.bbox("all")
-                    )
+            canvas = Canvas(results)
+            scrollbar = Scrollbar(results, orient="vertical", command=canvas.yview, width=20)
+            scrollable_frame = Frame(canvas, padx=30, pady=30)
+            scrollable_frame.bind(
+                "<Configure>",
+                lambda e: canvas.configure(
+                    scrollregion=canvas.bbox("all")
                 )
-                scrollable_frame.pack(side="right", fill="both")
-                canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-                canvas.configure(yscrollcommand=scrollbar.set)
+            )
+            scrollable_frame.pack(side="right", fill="both")
+            canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+            canvas.configure(yscrollcommand=scrollbar.set)
 
-                scrollbar.pack(side="right", fill="y")
-                canvas.pack(side="right", fill="both", expand=True)
+            scrollbar.pack(side="right", fill="y")
+            canvas.pack(side="right", fill="both", expand=True)
 
-                rank = self.ahp.calculate_ranking()
+            rank = self.ahp.calculate_ranking()
 
-                ranking = []
-                for i in range(len(rank[0])):
-                    ranking.append((rank[0][i], rank[1][i]))
-                top = ranking[0][1]
-                multi = 100 / top
-                label_tmp = Label(scrollable_frame, text="Which country is best\nto declare war on?",
-                                  font=("Arial", 50, "bold"))
-                label_tmp.grid(column=0, sticky=S, pady=10, padx=10)
-                for idx, country in enumerate(ranking):
-                    if idx == 0:
-                        label_tmp = Label(scrollable_frame,
-                                          text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), fg="#F00", justify=RIGHT,
-                                          bg="#AAA")
-                    elif idx == 1:
-                        label_tmp = Label(scrollable_frame,
-                                          text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), fg="#A00", justify=RIGHT,
-                                          bg="#AAA")
-                    elif idx == 2:
-                        label_tmp = Label(scrollable_frame,
-                                          text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), fg="#500", justify=RIGHT,
-                                          bg="#AAA")
-                    else:
-                        label_tmp = Label(scrollable_frame,
-                                          text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                          font=("Arial", round(country[1] * multi)), justify=RIGHT, bg="#AAA")
-                    label_tmp.grid(sticky=S, pady=10, padx=10)
-                    label_tmp.config(justify=RIGHT)
+            ranking = []
+            for i in range(len(rank[0])):
+                ranking.append((rank[0][i], rank[1][i]))
+            top = ranking[0][1]
+            multi = 100 / top
+            label_tmp = Label(scrollable_frame, text="Which country is best\nto declare war on?",
+                              font=("Arial", 50, "bold"))
+            label_tmp.grid(column=0, sticky=S, pady=10, padx=10)
+            for idx, country in enumerate(ranking):
+                if idx == 0:
+                    label_tmp = Label(scrollable_frame,
+                                      text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                      font=("Arial", round(country[1] * multi)), fg="#F00", justify=RIGHT,
+                                      bg="#AAA")
+                elif idx == 1:
+                    label_tmp = Label(scrollable_frame,
+                                      text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                      font=("Arial", round(country[1] * multi)), fg="#A00", justify=RIGHT,
+                                      bg="#AAA")
+                elif idx == 2:
+                    label_tmp = Label(scrollable_frame,
+                                      text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                      font=("Arial", round(country[1] * multi)), fg="#500", justify=RIGHT,
+                                      bg="#AAA")
+                else:
+                    label_tmp = Label(scrollable_frame,
+                                      text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
+                                      font=("Arial", round(country[1] * multi)), justify=RIGHT, bg="#AAA")
+                label_tmp.grid(sticky=S, pady=10, padx=10)
+                label_tmp.config(justify=RIGHT)
 
         buttonSolve = Button(root, text="Solve", font=("Arial", 26), command=solve, bg="blue", fg="pink",
                              width=40)
