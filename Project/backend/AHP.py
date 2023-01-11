@@ -1,3 +1,4 @@
+from copy import deepcopy
 from itertools import combinations
 from typing import List, Tuple, Union
 
@@ -30,6 +31,7 @@ class AHP:
             self._priority_vectors[k] = summed / matrix.shape[0]
 
     def calculate_ranking(self) -> Tuple[List[str], np.array]:
+        self._calculate_priority_vector()
         weights = np.zeros(len(self._db.countries))
         subcategories_map = self._db.subcategories_map
         countries = self._db.countries
@@ -49,10 +51,14 @@ class AHP:
         country_ranking = [country for _, country in sorted(zip(weights, countries), reverse=True)]
         return country_ranking, sorted(weights, reverse=True)
 
-    def get_inconsistency_index(self, matrix: str, expert: Union[int, str]) -> Union[float, str]:
-        matrix = self._db.get_matrix(matrix, expert)
-        if any(0 in sublist for sublist in matrix):
-            return "missing values!"
+    def get_inconsistency_index(self, matrix_name: str, expert: Union[int, str]) -> float:
+        complete_matrices = self._calculate_incomplete_matrices()
+        if isinstance(expert, str):
+            expert = self._db._experts.index(expert)
+        # for weight of categories use name 'categories'
+        matrix = deepcopy(complete_matrices[matrix_name][expert])
+        # if any(0 in sublist for sublist in matrix):
+        #     return "missing values!"
         index = 0
 
         for i, j, k in combinations(range(matrix.shape[0]), 3):
@@ -60,7 +66,20 @@ class AHP:
 
         return index
 
+    def _calculate_incomplete_matrices(self):
+        matrices = self._db.matrices
+        new_matrices = dict()
+        for k, v in matrices.items():
+            new_matrices[k] = deepcopy(v)
+            for expert in range(len(v)):
+                for i in range(len(v[0])):
+                    for j in range(len(v[0])):
+                        if new_matrices[k][expert][i][j] == 0:
+                            new_matrices[k][expert][i][i] += 1
+        return new_matrices
+
 
 def koczkodaj_index(matrix: np.array, i: int, j: int, k: int) -> float:
     return min(abs(1 - matrix[i][j] * matrix[j][k] / matrix[i][k]),
                abs(1 - matrix[i][k] / (matrix[i][j] * matrix[j][k])))
+
