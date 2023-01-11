@@ -467,9 +467,7 @@ class GUI:
                             else:
                                 name += str(subcategories_chosen) + " (" + str(category_chosen) + ")"
                         matrix = self.db.get_matrix(key, expert_chosen)
-                        inconsistency_index = self.ahp.get_inconsistency_index(key, expert_chosen)
-                        if not isinstance(inconsistency_index, str):
-                            inconsistency_index = str(round(inconsistency_index, 5))
+                        inconsistency_index = str(round(self.ahp.get_inconsistency_index(key, expert_chosen), 5))
                         name += "\nInconsistency Index: " + inconsistency_index
                         Table(preview_frame_bottom, matrix, labels, preview_frame_top, name)
 
@@ -824,7 +822,6 @@ class GUI:
         add_clear_all_button.grid(row=row_no, column=column_no)
 
     def create_solve_button(self, root, column_no, row_no):
-
         def solve():
             if self.db.is_missing_data():
                 showinfo(title='Missing data', message="The are some missing data! Ranking will be calculated on "
