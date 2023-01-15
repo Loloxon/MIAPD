@@ -126,8 +126,12 @@ class DataBase:
                 j = self._subcategories_map[name].index(j)
             else:
                 j = self._countries.index(j)
-        self._matrices[name][expert][i][j] = value
-        self._matrices[name][expert][j][i] = max(min(1 / value, 9), 1 / 9)
+        if value==0:
+            self._matrices[name][expert][i][j] = value
+            self._matrices[name][expert][j][i] = value
+        else:
+            self._matrices[name][expert][i][j] = value
+            self._matrices[name][expert][j][i] = max(min(1 / value, 9), 1 / 9)
 
     # not used anymore
     # def set_matrix(self, name: str, expert: Union[int, str], matrix: np.array) -> None:

@@ -480,9 +480,9 @@ class GUI:
                             mod = len(labels)
                             values = values[mod * 2:]
                             for v in values:
-                                if not isfloat(v) or float(v) <= 0 or float(v) > 9:
+                                if not isfloat(v) or not (0 <= float(v) <= 9):
                                     showinfo(title='Invalid data!',
-                                             message="Values need to be float type in range [1/9,9]")
+                                             message="Values need to be float type in range [1/9,9] or 0")
                                     return
 
                             true_category = category_chosen
@@ -830,7 +830,7 @@ class GUI:
             # else:
             results = Toplevel()
             results.title("Ranking")
-            results.geometry("1170x900")
+            results.geometry("1600x900")
             results.resizable(False, False)
 
             canvas = Canvas(results)
@@ -855,30 +855,32 @@ class GUI:
             for i in range(len(rank[0])):
                 ranking.append((rank[0][i], rank[1][i]))
             top = ranking[0][1]
+            bottom = ranking[-1][1]*0.6
             multi = 100 / top
             label_tmp = Label(scrollable_frame, text="Which country is best\nto declare war on?",
                               font=("Arial", 50, "bold"))
             label_tmp.grid(column=0, sticky=S, pady=10, padx=10)
             for idx, country in enumerate(ranking):
+                print((country[1]-bottom))
                 if idx == 0:
                     label_tmp = Label(scrollable_frame,
                                       text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                      font=("Arial", round(country[1] * multi)), fg="#F00", justify=RIGHT,
+                                      font=("Arial", round((country[1]-bottom) * multi)), fg="#F00", justify=RIGHT,
                                       bg="#AAA")
                 elif idx == 1:
                     label_tmp = Label(scrollable_frame,
                                       text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                      font=("Arial", round(country[1] * multi)), fg="#A00", justify=RIGHT,
+                                      font=("Arial", round((country[1]-bottom) * multi)), fg="#A00", justify=RIGHT,
                                       bg="#AAA")
                 elif idx == 2:
                     label_tmp = Label(scrollable_frame,
                                       text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                      font=("Arial", round(country[1] * multi)), fg="#500", justify=RIGHT,
+                                      font=("Arial", round((country[1]-bottom) * multi)), fg="#500", justify=RIGHT,
                                       bg="#AAA")
                 else:
                     label_tmp = Label(scrollable_frame,
                                       text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
-                                      font=("Arial", round(country[1] * multi)), justify=RIGHT, bg="#AAA")
+                                      font=("Arial", round((country[1]-bottom) * multi)), justify=RIGHT, bg="#AAA")
                 label_tmp.grid(sticky=S, pady=10, padx=10)
                 label_tmp.config(justify=RIGHT)
 
