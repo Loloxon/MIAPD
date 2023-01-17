@@ -56,9 +56,7 @@ class AHP:
         if isinstance(expert, str):
             expert = self._db._experts.index(expert)
         # for weight of categories use name 'categories'
-        matrix = deepcopy(complete_matrices[matrix_name][expert])
-        # if any(0 in sublist for sublist in matrix):
-        #     return "missing values!"
+        matrix = self._db.get_matrix(matrix_name, expert)
         index = 0
 
         for i, j, k in combinations(range(matrix.shape[0]), 3):
@@ -80,6 +78,8 @@ class AHP:
 
 
 def koczkodaj_index(matrix: np.array, i: int, j: int, k: int) -> float:
+    if matrix[i][j] == 0 or matrix[j][k] == 0 or matrix[k][i] == 0:
+        return 0
     return min(abs(1 - matrix[i][j] * matrix[j][k] / matrix[i][k]),
                abs(1 - matrix[i][k] / (matrix[i][j] * matrix[j][k])))
 
