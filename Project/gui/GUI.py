@@ -861,7 +861,6 @@ class GUI:
                               font=("Arial", 50, "bold"))
             label_tmp.grid(column=0, sticky=S, pady=10, padx=10)
             for idx, country in enumerate(ranking):
-                print((country[1]-bottom))
                 if idx == 0:
                     label_tmp = Label(scrollable_frame,
                                       text=country[0] + ": " + str(round(country[1] * 100, 2)) + "%",
